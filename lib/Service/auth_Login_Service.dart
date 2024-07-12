@@ -5,7 +5,7 @@ import 'package:ponto/utils/apiRoutes.dart';
 class AuthService {
   static String? accessToken;
   static String? userId;
-
+  static String? profileID;
   Future<Map<String, String>?> login(String email, String password) async {
     final url = Uri.parse('$APIROUTS/signin');
     final basicAuth = 'Basic ${base64Encode(utf8.encode('$email:$password'))}';

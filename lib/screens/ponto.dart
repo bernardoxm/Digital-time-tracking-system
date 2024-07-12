@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:ponto/Service/ponto_Service.dart';
 import 'package:ponto/controller/local_auth.dart';
 import 'package:ponto/model/usuario.dart';
 import 'package:ponto/screens/perfil.dart';
@@ -286,6 +287,39 @@ class Ponto extends StatelessWidget {
                                       .indexWhere((element) => element == null);
                                   if (index != -1 && index < 4) {
                                     model.registrarPonto(index, context);
+
+                                    // Obter a data e hora formatadas
+                                    String formattedDate =
+                                        formatterDate.format(model.now);
+                                    String formattedTime =
+                                        formatterTime.format(model.now);
+
+                                    // Enviar para a API
+                                    bool success =
+                                        await ApiPontoService().sendPunchClock(
+                                      '$formattedDate $formattedTime',
+                                      usuario.profileID,
+                                    );
+
+                                    if (success) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              'Ponto marcado com sucesso.'),
+                                          duration: Duration(seconds: 2),
+                                        ),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content:
+                                              Text('Erro ao enviar o ponto.'),
+                                          duration: Duration(seconds: 2),
+                                        ),
+                                      );
+                                    }
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(

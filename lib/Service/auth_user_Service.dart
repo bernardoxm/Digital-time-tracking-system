@@ -10,28 +10,27 @@ class UserService {
   Future<Usuario?> fetchUser(String token, String idUser) async {
     final token = AuthService.accessToken;
     final idUser = AuthService.userId;
-      
-   
 
     try {
-       if (token == null || idUser == null) {
-      print('Token ou ID de usuário não disponíveis');
-      return null;
-    }
+      if (token == null || idUser == null) {
+        print('Token ou ID de usuário não disponíveis');
+        return null;
+      }
 
-    final url = '$APIROUTS/user/$idUser';
+      final url = '$APIROUTS/user/$idUser';
 
-    final headers = {
-      
-      'Authorization': 'Bearer $token',
-    };
+      final headers = {
+        'Authorization': 'Bearer $token',
+      };
       final response = await http.get(Uri.parse(url), headers: headers);
-
+      print(response.body);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return Usuario(
           fullName: data['fullName'],
           email: data['emailAccess'],
+          profileID: data['_id'],
+
           // Adicione outros campos conforme necessário
         );
       } else {

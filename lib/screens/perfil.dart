@@ -22,8 +22,7 @@ class PerfilPageState extends State<PerfilPage> {
   ImageProvider? _imageProvider;
   bool _isLoading = true;
   static bool isValidVoltar = false;
-   late Usuario _usuario = Usuario(fullName: '', email: '');
-
+  late Usuario _usuario = Usuario(fullName: '', email: '', profileID: '');
 
   @override
   void initState() {
@@ -55,10 +54,12 @@ class PerfilPageState extends State<PerfilPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? fullName = prefs.getString('userFullName');
     String? email = prefs.getString('userEmail');
+    String? profileID = prefs.getString('profileid');
 
-    if (fullName != null && email != null) {
+    if (fullName != null && email != null && profileID != null) {
       setState(() {
-        _usuario = Usuario(fullName: fullName, email: email);
+        _usuario =
+            Usuario(fullName: fullName, email: email, profileID: profileID);
         _isLoading = false;
       });
     } else {
@@ -79,6 +80,7 @@ class PerfilPageState extends State<PerfilPage> {
             _usuario = Usuario(
               fullName: 'ERRO GET USER',
               email: 'ERRO GET USER',
+              profileID: 'ERRO GET ID',
             );
             _isLoading = false;
           });
@@ -88,6 +90,7 @@ class PerfilPageState extends State<PerfilPage> {
           _usuario = Usuario(
             fullName: 'ERRO GET USER',
             email: 'ERRO GET USER',
+            profileID: 'ERRO GET ID',
           );
           _isLoading = false;
         });
@@ -99,6 +102,7 @@ class PerfilPageState extends State<PerfilPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userFullName', usuario.fullName);
     await prefs.setString('userEmail', usuario.email);
+    await prefs.setString('profileid', usuario.profileID);
   }
 
   @override
