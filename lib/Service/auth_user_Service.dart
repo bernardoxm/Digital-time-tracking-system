@@ -17,7 +17,7 @@ class UserService {
         return null;
       }
 
-      final url = '$APIROUTS/user/$idUser';
+      final url = '$APIROUTES/user/$idUser';
 
       final headers = {
         'Authorization': 'Bearer $token',

@@ -7,7 +7,7 @@ class AuthService {
   static String? userId;
   static String? profileID;
   Future<Map<String, String>?> login(String email, String password) async {
-    final url = Uri.parse('$APIROUTS/signin');
+    final url = Uri.parse('$APIROUTES/signin');
     final basicAuth = 'Basic ${base64Encode(utf8.encode('$email:$password'))}';
 
     try {

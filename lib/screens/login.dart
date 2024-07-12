@@ -66,79 +66,81 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-Future<bool> validateAccess(BuildContext context) async {
-  if (_email.isEmpty || _password.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('E-mail e senha são obrigatórios.'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-    return false;
-  }
-
-  _isLoading = true;
-  notifyListeners();
-
-  try {
-    bool hasBiometrics = await _authController.checkBiometrics();
-    bool authenticated = true;
-    if (hasBiometrics) {
-      authenticated = await _authController.authenticate();
+  Future<bool> validateAccess(BuildContext context) async {
+    if (_email.isEmpty || _password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('E-mail e senha são obrigatórios.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return false;
     }
 
-    if (LoginController.isEmailAndPasswordValid(_email, _password) &&
-        authenticated) {
-      final response = await    _authService.login(_email, _password);
+    _isLoading = true;
+    notifyListeners();
 
-      if (response != null) {
-        print(response);
+    try {
+      bool hasBiometrics = await _authController.checkBiometrics();
+      bool authenticated = true;
+      if (hasBiometrics) {
+        authenticated = await _authController.authenticate();
+      }
 
-        if (_isChecked) {
-          await savePreferences();
+      if (LoginController.isEmailAndPasswordValid(_email, _password) &&
+          authenticated) {
+        final response = await _authService.login(_email, _password);
+
+        if (response != null) {
+          print(response);
+
+          if (_isChecked) {
+            await savePreferences();
+          } else {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.remove('keepLoggedIn');
+            prefs.remove('email');
+            prefs.remove('password');
+            prefs.remove('hasBiometrics');
+          }
+
+          _isLoading = false;
+          notifyListeners();
+          return true; // Retorna true apenas se a autenticação e a API forem bem-sucedidas
         } else {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.remove('keepLoggedIn');
-          prefs.remove('email');
-          prefs.remove('password');
-          prefs.remove('hasBiometrics');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content:
+                  Text('Erro ao fazer login. Usuario não encontrado na base'),
+              duration: Duration(seconds: 2),
+            ),
+          );
         }
-
-        _isLoading = false;
-        notifyListeners();
-        return true; // Retorna true apenas se a autenticação e a API forem bem-sucedidas
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Erro ao fazer login. Usuario não encontrado na base'),
+            content: Text('Não autenticado. Não foi possível efetuar o Login.'),
             duration: Duration(seconds: 2),
           ),
         );
       }
-    } else {
+    } catch (e) {
+      print(e);
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Não autenticado. Não foi possível efetuar o Login.'),
+          content:
+              Text('Erro durante a autenticação. E-mail ou senha incorretos.'),
           duration: Duration(seconds: 2),
         ),
       );
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
-  } catch (e) {
-    print(e);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Erro durante a autenticação. E-mail ou senha incorretos.'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-  } finally {
-    _isLoading = false;
-    notifyListeners();
+    return false;
   }
-
-  return false;
-}
 
   void setEmail(String value) {
     _email = value;
@@ -283,7 +285,8 @@ class _LoginFormState extends State<LoginForm> {
                   ),
                 ),
               if (!provider.showInput)
-                loginShowObjects(widthbox, fontSizeall, provider),
+                if (!provider.isLoading)
+                  loginShowObjects(widthbox, fontSizeall, provider),
               const SizedBox(height: 10),
               if (provider.showInput)
                 Container(

@@ -1,18 +1,19 @@
 import 'dart:convert';
+import 'dart:nativewrappers/_internal/vm/lib/core_patch.dart' as core;
 import 'package:http/http.dart' as http;
 import 'package:ponto/Service/auth_Login_Service.dart';
 import 'package:ponto/Service/auth_user_Service.dart';
-// Garanta que AuthService esteja no local correto
+import 'package:ponto/utils/apiRoutes.dart';
 
 class ApiPontoService {
-  static const String baseUrl =
-      'https://api-my-company.vercel.app/api/v1/punch-clock';
+  static String baseUrl = '$APIROUTES/punch-clock';
 
-  Future<bool> sendPunchClock(String punchClockDate, String employeeId) async {
+  Future<bool> sendPunchClock(
+      DateTime punchClockDate, String employeeId) async {
     final token = AuthService.accessToken;
-    final profileID = AuthService.profileID;
-    if (token == null && profileID == null) {
-      print('Token de autenticação não disponível ou ID do Perfil esta nulo');
+
+    if (token == null || employeeId == null) {
+      print('Token de autenticação não disponível ou ID do Perfil está nulo');
       return false;
     }
 
@@ -21,13 +22,14 @@ class ApiPontoService {
         Uri.parse(baseUrl),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token' // Utiliza o token para autenticação
+          'Authorization': 'Bearer $token',
         },
         body: jsonEncode({
-          'punchClockDate': punchClockDate,
-          'employee': profileID,
+          'punchClockDate': punchClockDate.toIso8601String(),
+          'employee': employeeId,
         }),
       );
+
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return true;
       } else {

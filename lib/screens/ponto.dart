@@ -297,7 +297,8 @@ class Ponto extends StatelessWidget {
                                     // Enviar para a API
                                     bool success =
                                         await ApiPontoService().sendPunchClock(
-                                      '$formattedDate $formattedTime',
+                                      '$formattedDate $formattedTime'
+                                          as DateTime,
                                       usuario.profileID,
                                     );
 
