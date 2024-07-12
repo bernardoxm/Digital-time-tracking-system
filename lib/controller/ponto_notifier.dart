@@ -20,7 +20,7 @@ class PontoNotifier extends ChangeNotifier {
   File? _image;
   late ImageSelectController _imageSelectController;
   final LocalAuthController _authController = LocalAuthController();
-    late Usuario _usuario = Usuario(fullName: '', email: '');
+  late Usuario _usuario = Usuario(fullName: '', email: '');
 
   late BuildContext _context;
   DateTime? _expiryDate;
@@ -91,11 +91,14 @@ class PontoNotifier extends ChangeNotifier {
     await prefs.setString('userEmail', usuario.email);
   }
 
+  DateTime? lastPontoTime;
+
   File? get image => _image;
   DateTime get now => _now;
   Usuario get usuario => _usuario;
   bool get isLoadingImage => _isLoadingImage;
-  bool get isLoadingUser => _isLoadingUser; // Getter para o estado de carregamento do usuário
+  bool get isLoadingUser =>
+      _isLoadingUser; // Getter para o estado de carregamento do usuário
 
   Future<void> pickImage(BuildContext context) async {
     _isLoadingImage = true;
@@ -132,6 +135,19 @@ class PontoNotifier extends ChangeNotifier {
       return;
     }
 
+    if (lastPontoTime != null &&
+        now.difference(lastPontoTime!).inMinutes < 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Você precisa esperar pelo menos 10 minutos para marcar o próximo ponto.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+    lastPontoTime = now;
+
     pontos[index] = DateTime.now();
     notifyListeners();
 
@@ -151,15 +167,19 @@ class PontoNotifier extends ChangeNotifier {
 
   Future<void> _savePointsLocally() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> pontosJson =
-        pontos.map((point) => point != null ? point.toIso8601String() : '').toList();
+    List<String> pontosJson = pontos
+        .map((point) => point != null ? point.toIso8601String() : '')
+        .toList();
     await prefs.setStringList('pontos', pontosJson);
   }
 
   Future<void> _loadPointsLocally() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? pontosJson = prefs.getStringList('pontos');
-    pontos = pontosJson?.map((point) => point.isNotEmpty ? DateTime.parse(point) : null).toList() ?? List.filled(4, null);
+    pontos = pontosJson
+            ?.map((point) => point.isNotEmpty ? DateTime.parse(point) : null)
+            .toList() ??
+        List.filled(4, null);
     notifyListeners();
   }
 

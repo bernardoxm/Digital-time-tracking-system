@@ -41,7 +41,7 @@ class Ponto extends StatelessWidget {
                       child: Column(
                         children: [
                           Container(
-                            height: buttompading,
+                            height: 200,
                             decoration: const BoxDecoration(
                               gradient: LinearGradient(
                                 begin: Alignment.topLeft,
@@ -52,23 +52,45 @@ class Ponto extends StatelessWidget {
                                 ],
                               ),
                               borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(100),
-                                bottomRight: Radius.circular(0),
+                                bottomLeft: Radius.circular(30),
+                                bottomRight: Radius.circular(30),
                               ),
                             ),
-                            child: Row(
+                            child: Column(
                               children: [
+                                SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.02,
+                                ),
+                                Center(
+                                  child: Container(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        PerfilPageState.isValidVoltar = true;
+                                        Get.to(const PerfilPage());
+                                      },
+                                      child: model.isLoading
+                                          ? const CircularProgressIndicator()
+                                          : CircleAvatar(
+                                              key: UniqueKey(),
+                                              radius: 75,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              backgroundImage:
+                                                  model.imageProvider,
+                                              foregroundColor:
+                                                  const Color.fromARGB(
+                                                      0, 255, 255, 255),
+                                            ),
+                                    ),
+                                  ),
+                                ),
                                 SizedBox(
                                   width:
                                       MediaQuery.of(context).size.width * 0.09,
                                 ),
                                 Column(
                                   children: [
-                                    SizedBox(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.12,
-                                    ),
                                     Text(
                                       usuario.fullName,
                                       style: const TextStyle(
@@ -77,30 +99,6 @@ class Ponto extends StatelessWidget {
                                           fontSize: 20),
                                     ),
                                   ],
-                                ),
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.09,
-                                ),
-                                Container(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      PerfilPageState.isValidVoltar = true;
-                                      Get.to(const PerfilPage());
-                                    },
-                                    child: model.isLoading
-                                        ? const CircularProgressIndicator()
-                                        : CircleAvatar(
-                                            key: UniqueKey(),
-                                            radius: 75,
-                                            backgroundColor: Colors.transparent,
-                                            backgroundImage:
-                                                model.imageProvider,
-                                            foregroundColor:
-                                                const Color.fromARGB(
-                                                    0, 255, 255, 255),
-                                          ),
-                                  ),
                                 ),
                               ],
                             ),
