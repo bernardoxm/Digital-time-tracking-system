@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ponto/Service/auth_Login_Service.dart';
 import 'package:ponto/Service/auth_user_Service.dart';
+import 'package:ponto/Service/ponto_Service.dart';
 // Adicione a importação do UserService
 import 'package:ponto/controller/image_select.dart';
 import 'package:ponto/controller/local_auth.dart';
 import 'package:ponto/model/usuario.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class PontoNotifier extends ChangeNotifier {
   late Timer _timer;
@@ -183,6 +185,18 @@ class PontoNotifier extends ChangeNotifier {
             .toList() ??
         List.filled(4, null);
     notifyListeners();
+  }
+
+  Future<bool> checkApiAvailability() async {
+    try {
+      final response = await http.get(Uri.parse(ApiPontoService.baseUrl));
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return true;
+      }
+    } catch (e) {
+      print('Exception checking API availability: $e');
+    }
+    return false;
   }
 
   @override

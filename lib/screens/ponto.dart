@@ -282,7 +282,9 @@ class Ponto extends StatelessWidget {
                                       await authController.authenticate();
                                 }
 
-                                if (authenticated) {
+                                if (authenticated &&
+                                    ApiPontoService.ValidateAPIpontoService ==
+                                        true) {
                                   int index = model.pontos
                                       .indexWhere((element) => element == null);
                                   if (index != -1 && index < 4) {
@@ -295,6 +297,7 @@ class Ponto extends StatelessWidget {
                                         formatterTime.format(model.now);
 
                                     // Enviar para a API
+
                                     bool success =
                                         await ApiPontoService().sendPunchClock(
                                       '$formattedDate $formattedTime'
@@ -311,7 +314,9 @@ class Ponto extends StatelessWidget {
                                           duration: Duration(seconds: 2),
                                         ),
                                       );
-                                    } else {
+                                    } else if (ApiPontoService
+                                            .ValidateAPIpontoService ==
+                                        false) {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
