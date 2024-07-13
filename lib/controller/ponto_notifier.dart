@@ -22,7 +22,11 @@ class PontoNotifier extends ChangeNotifier {
   File? _image;
   late ImageSelectController _imageSelectController;
   final LocalAuthController _authController = LocalAuthController();
-  late Usuario _usuario = Usuario(fullName: '', email: '', profileID: '');
+  late Usuario _usuario = Usuario(
+    fullName: '',
+    email: '',
+    profileID: '',
+  );
 
   late BuildContext _context;
   DateTime? _expiryDate;
@@ -63,10 +67,14 @@ class PontoNotifier extends ChangeNotifier {
     String? fullName = prefs.getString('userFullName');
     String? email = prefs.getString('userEmail');
     String? profileID = prefs.getString('profileID');
+    String? employerID = prefs.getString('employerID');
 
     if (fullName != null && email != null && profileID != null) {
-      _usuario =
-          Usuario(fullName: fullName, email: email, profileID: profileID);
+      _usuario = Usuario(
+        fullName: fullName,
+        email: email,
+        profileID: profileID,
+      );
       _isLoadingUser = false;
       notifyListeners();
     } else {
@@ -79,9 +87,10 @@ class PontoNotifier extends ChangeNotifier {
         _saveUserToPrefs(_usuario);
       } else {
         _usuario = Usuario(
-            fullName: 'ERRO GET USER',
-            email: 'ERRO GET USER',
-            profileID: 'ERRO GET ID');
+          fullName: 'ERRO GET USER',
+          email: 'ERRO GET USER',
+          profileID: 'ERRO GET ID',
+        );
       }
 
       _isLoadingUser = false;

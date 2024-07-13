@@ -22,7 +22,11 @@ class PerfilPageState extends State<PerfilPage> {
   ImageProvider? _imageProvider;
   bool _isLoading = true;
   static bool isValidVoltar = false;
-  late Usuario _usuario = Usuario(fullName: '', email: '', profileID: '');
+  late Usuario _usuario = Usuario(
+    fullName: '',
+    email: '',
+    profileID: '',
+  );
 
   @override
   void initState() {
@@ -55,11 +59,15 @@ class PerfilPageState extends State<PerfilPage> {
     String? fullName = prefs.getString('userFullName');
     String? email = prefs.getString('userEmail');
     String? profileID = prefs.getString('profileid');
+    String? employerID = prefs.getString('employer');
 
     if (fullName != null && email != null && profileID != null) {
       setState(() {
-        _usuario =
-            Usuario(fullName: fullName, email: email, profileID: profileID);
+        _usuario = Usuario(
+          fullName: fullName,
+          email: email,
+          profileID: profileID,
+        );
         _isLoading = false;
       });
     } else {
