@@ -9,6 +9,7 @@ import 'package:ponto/Service/ponto_Service.dart';
 // Adicione a importação do UserService
 import 'package:ponto/controller/image_select.dart';
 import 'package:ponto/controller/local_auth.dart';
+import 'package:ponto/model/employerRep.dart';
 import 'package:ponto/model/usuario.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -27,6 +28,7 @@ class PontoNotifier extends ChangeNotifier {
     email: '',
     profileID: '',
   );
+  late Employerrep _employer = Employerrep(employerID: '');
 
   late BuildContext _context;
   DateTime? _expiryDate;
@@ -69,12 +71,16 @@ class PontoNotifier extends ChangeNotifier {
     String? profileID = prefs.getString('profileID');
     String? employerID = prefs.getString('employerID');
 
-    if (fullName != null && email != null && profileID != null) {
+    if (fullName != null &&
+        email != null &&
+        profileID != null &&
+        employerID != null) {
       _usuario = Usuario(
         fullName: fullName,
         email: email,
         profileID: profileID,
       );
+      _employer = Employerrep(employerID: employerID);
       _isLoadingUser = false;
       notifyListeners();
     } else {

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:ponto/Service/ponto_Service.dart';
 import 'package:ponto/controller/local_auth.dart';
+import 'package:ponto/model/employerRep.dart';
 import 'package:ponto/model/usuario.dart';
 import 'package:ponto/screens/perfil.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +24,8 @@ class Ponto extends StatelessWidget {
       child: Consumer<PontoNotifier>(
         builder: (context, model, _) {
           final Usuario usuario = model.usuario;
+          final Employerrep employerId = employerrep;
+
           var formatterDate = DateFormat('dd/MM/yyyy');
           var formatterTime = DateFormat('HH:mm', 'pt_BR');
           String formattedDate = formatterDate.format(model.now);
@@ -302,7 +305,7 @@ class Ponto extends StatelessWidget {
                                         await ApiPontoService().sendPunchClock(
                                       '$formattedDate $formattedTime'
                                           as DateTime,
-                                      usuario.profileID,
+                                      employID.employerID,
                                     );
 
                                     if (success) {

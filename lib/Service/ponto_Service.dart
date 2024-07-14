@@ -14,7 +14,7 @@ class ApiPontoService {
     final token = AuthService.accessToken;
     final employerID = EmployerService.employerID;
 
-    if (token == null || profileID == null) {
+    if (token == null || employerID == null) {
       print('Token de autenticação não disponível ou ID do Perfil está nulo');
       return false;
     }
