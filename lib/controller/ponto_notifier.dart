@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:ponto/Service/auth_Login_Service.dart';
 import 'package:ponto/Service/auth_user_Service.dart';
@@ -9,9 +10,9 @@ import 'package:ponto/Service/ponto_Service.dart';
 // Adicione a importação do UserService
 import 'package:ponto/controller/image_select.dart';
 import 'package:ponto/controller/local_auth.dart';
+import 'package:ponto/model/employerRep.dart';
 import 'package:ponto/model/usuario.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 
 class PontoNotifier extends ChangeNotifier {
   late Timer _timer;
@@ -22,7 +23,12 @@ class PontoNotifier extends ChangeNotifier {
   File? _image;
   late ImageSelectController _imageSelectController;
   final LocalAuthController _authController = LocalAuthController();
-  late Usuario _usuario = Usuario(fullName: '', email: '', profileID: '');
+  late Usuario _usuario = Usuario(
+    fullName: '',
+    email: '',
+    profileID: '',
+  );
+  late Employerrep _employer = Employerrep(employerID: '');
 
   late BuildContext _context;
   DateTime? _expiryDate;
@@ -63,10 +69,18 @@ class PontoNotifier extends ChangeNotifier {
     String? fullName = prefs.getString('userFullName');
     String? email = prefs.getString('userEmail');
     String? profileID = prefs.getString('profileID');
+    String? employerID = prefs.getString('employerID');
 
-    if (fullName != null && email != null && profileID != null) {
-      _usuario =
-          Usuario(fullName: fullName, email: email, profileID: profileID);
+    if (fullName != null &&
+        email != null &&
+        profileID != null &&
+        employerID != null) {
+      _usuario = Usuario(
+        fullName: fullName,
+        email: email,
+        profileID: profileID,
+      );
+      _employer = Employerrep(employerID: employerID);
       _isLoadingUser = false;
       notifyListeners();
     } else {
@@ -79,9 +93,10 @@ class PontoNotifier extends ChangeNotifier {
         _saveUserToPrefs(_usuario);
       } else {
         _usuario = Usuario(
-            fullName: 'ERRO GET USER',
-            email: 'ERRO GET USER',
-            profileID: 'ERRO GET ID');
+          fullName: 'ERRO GET USER',
+          email: 'ERRO GET USER',
+          profileID: 'ERRO GET ID',
+        );
       }
 
       _isLoadingUser = false;
@@ -100,6 +115,7 @@ class PontoNotifier extends ChangeNotifier {
   File? get image => _image;
   DateTime get now => _now;
   Usuario get usuario => _usuario;
+  Employerrep get employerID => employerID;
   bool get isLoadingImage => _isLoadingImage;
   bool get isLoadingUser =>
       _isLoadingUser; // Getter para o estado de carregamento do usuário

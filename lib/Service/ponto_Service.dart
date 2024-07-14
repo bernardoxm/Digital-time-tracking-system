@@ -1,8 +1,9 @@
 import 'dart:convert';
-import 'dart:nativewrappers/_internal/vm/lib/core_patch.dart' as core;
+
 import 'package:http/http.dart' as http;
 import 'package:ponto/Service/auth_Login_Service.dart';
 import 'package:ponto/Service/auth_user_Service.dart';
+import 'package:ponto/Service/employer_Service.dart';
 import 'package:ponto/utils/apiRoutes.dart';
 
 class ApiPontoService {
@@ -11,8 +12,9 @@ class ApiPontoService {
 
   Future<bool> sendPunchClock(DateTime punchClockDate, String profileID) async {
     final token = AuthService.accessToken;
+    final employerID = EmployerService.employerID;
 
-    if (token == null || profileID == null) {
+    if (token == null || employerID == null) {
       print('Token de autenticação não disponível ou ID do Perfil está nulo');
       return false;
     }
@@ -26,7 +28,7 @@ class ApiPontoService {
         },
         body: jsonEncode({
           'punchClockDate': punchClockDate.toIso8601String(),
-          'employee': profileID,
+          'employee': employerID,
         }),
       );
 
