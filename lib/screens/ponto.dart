@@ -26,8 +26,6 @@ class Ponto extends StatelessWidget {
       child: Consumer<PontoNotifier>(
         builder: (context, model, _) {
           final Usuario usuario = model.usuario;
-          final Employerrep employerId = model.employerID;
-
           var formatterDate = DateFormat('dd/MM/yyyy');
           var formatterTime = DateFormat('HH:mm', 'pt_BR');
           String formattedDate = formatterDate.format(model.now);
@@ -307,7 +305,7 @@ class Ponto extends StatelessWidget {
                                         await ApiPontoService().sendPunchClock(
                                       '$formattedDate $formattedTime'
                                           as DateTime,
-                                      employerId.employerID,
+                                      usuario.profileID,
                                     );
 
                                     if (success) {
