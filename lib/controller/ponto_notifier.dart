@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 import 'package:ponto/Service/auth_Login_Service.dart';
 import 'package:ponto/Service/auth_user_Service.dart';
 import 'package:ponto/Service/ponto_Service.dart';
-
 import 'package:ponto/controller/image_select.dart';
 import 'package:ponto/controller/local_auth.dart';
 import 'package:ponto/model/employer.dart';
@@ -165,7 +164,7 @@ class PontoNotifier extends ChangeNotifier {
       return;
     }
 
-    if (lastPontoTime != null && now.difference(lastPontoTime!).inMinutes < 1) {
+    if (lastPontoTime != null && now.difference(lastPontoTime!).inMinutes < 2) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(

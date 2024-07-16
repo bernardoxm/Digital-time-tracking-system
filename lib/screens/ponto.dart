@@ -152,7 +152,7 @@ class Ponto extends StatelessWidget {
                                     formattedTime,
                                     style: TextStyle(
                                       fontSize: fontSizeTime,
-                                      color: Color.fromARGB(255, 255, 255, 255),
+                                      color: const  Color.fromARGB(255, 255, 255, 255),
                                     ),
                                   ),
                                 ),
@@ -222,8 +222,8 @@ class Ponto extends StatelessWidget {
                                         horizontal: 10, vertical: 5),
                                     decoration: BoxDecoration(
                                       color: model.pontos[index] != null
-                                          ? Color.fromARGB(255, 0, 191, 99)
-                                          : Color.fromARGB(33, 0, 191, 99),
+                                          ?const  Color.fromARGB(255, 0, 191, 99)
+                                          :const Color.fromARGB(33, 0, 191, 99),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Column(
@@ -276,7 +276,7 @@ class Ponto extends StatelessWidget {
                             ),
                             child: TextButton(
                               onPressed: () async {
-                                await EmployerService().fetchEmployer();
+                                await EmployerService().fetchEmployer();// Certifique-se de buscar o employerID antes de marcar o ponto
                                 bool hasBiometrics =
                                     await authController.checkBiometrics();
                                 bool authenticated = true;
@@ -286,15 +286,13 @@ class Ponto extends StatelessWidget {
                                       await authController.authenticate();
                                 }
 
-                                if (authenticated &&
-                                    ApiPontoService.ValidateAPIpontoService ==
-                                        true) {
-                                  // Certifique-se de buscar o employerID antes de marcar o ponto
+                                if (authenticated ) {
+                                  
 
                                   int index = model.pontos
                                       .indexWhere((element) => element == null);
                                   if (index != -1 && index < 4) {
-                                    model.registrarPonto(index, context);
+                                    
 
                                     // Obter a data e hora formatadas
                                     String formattedDate =
@@ -308,14 +306,16 @@ class Ponto extends StatelessWidget {
                                       model.now,
                                     );
 
-                                    if (success) {
+                                    if (success) { model.registrarPonto(index, context);
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
                                           content: Text(
                                               'Ponto marcado com sucesso.'),
                                           duration: Duration(seconds: 2),
+                                        
                                         ),
+                                       
                                       );
                                     } else {
                                       ScaffoldMessenger.of(context)
@@ -324,6 +324,7 @@ class Ponto extends StatelessWidget {
                                           content:
                                               Text('Erro ao enviar o ponto.'),
                                           duration: Duration(seconds: 2),
+                                          
                                         ),
                                       );
                                     }
