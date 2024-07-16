@@ -49,5 +49,5 @@ class AuthService {
     }
   }
 
-  static void logout() {}
+
 }
