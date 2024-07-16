@@ -1,3 +1,5 @@
+//CHECK BIOMETRIA DO USUARIO E SE CASO NAO TIVER BIOMETRIA ELE VALIDA TAMBEM. 
+
 import 'package:local_auth/local_auth.dart';
 
 class LocalAuthController {

@@ -7,13 +7,13 @@ import 'package:intl/intl.dart';
 import 'package:ponto/Service/auth_Login_Service.dart';
 import 'package:ponto/Service/auth_user_Service.dart';
 import 'package:ponto/Service/ponto_Service.dart';
-// Adicione a importação do UserService
+
 import 'package:ponto/controller/image_select.dart';
 import 'package:ponto/controller/local_auth.dart';
-import 'package:ponto/model/employerRep.dart';
+import 'package:ponto/model/employer.dart';
 import 'package:ponto/model/usuario.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+//PONTO NOTIFIER, SE TRATA DA APLICACAO ESTA NO ESTADO StatelessWidget ESSA PARTE FAZ TODA A MUDANCA DA APLICAO, COMO MUDANCA DO RELOGIO, OU QUALQUER ATIVIDADE FEITA PELO USUARIO.
 class PontoNotifier extends ChangeNotifier {
   late Timer _timer;
   DateTime _now = DateTime.now();
@@ -28,7 +28,7 @@ class PontoNotifier extends ChangeNotifier {
     email: '',
     profileID: '',
   );
-  late Employerrep _employer = Employerrep(employerID: '');
+  late Employer _employer = Employer(employerID: '');
 
   late BuildContext _context;
   DateTime? _expiryDate;
@@ -40,16 +40,17 @@ class PontoNotifier extends ChangeNotifier {
     pontoExpiry();
     _initImage();
     _loadPointsLocally();
-    _initUsuario(); // Carregar usuário da API ou localmente
+    _initUsuario();// Carregar usuário da API ou localmente
+    _employerlading(); // Carregar usuário da API ou localmente
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      _now = DateTime.now();
+      _now = DateTime. now();
       notifyListeners();
     });
   }
 
   ImageProvider? imageProvider;
   bool isLoading = true;
-
+//INICIA A IMAGEM DO USUAIRO, CASO AO CONTRARIO ELA SETA A IMAGEM DEFULT
   void _initImage() async {
     await _imageSelectController.initSharedPreferences();
     File? savedImage = await _imageSelectController.getSavedImage();
@@ -63,24 +64,33 @@ class PontoNotifier extends ChangeNotifier {
       isLoading = false;
     }
   }
+//CARREGA O EMPLOTYER CONFORME A API PARA ALIMENTAR A API PONTO. 
+  void _employerlading() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    String? employerID = prefs.getString('employer');
+
+    if (employerID != null) {
+      _employer = Employer(employerID: employerID);
+
+      notifyListeners();
+    }
+    ;
+  }
+// INICIALIZA O USUARIO AO SER CHAMADO. 
   void _initUsuario() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? fullName = prefs.getString('userFullName');
     String? email = prefs.getString('userEmail');
     String? profileID = prefs.getString('profileID');
-    String? employerID = prefs.getString('employerID');
 
-    if (fullName != null &&
-        email != null &&
-        profileID != null &&
-        employerID != null) {
+    if (fullName != null && email != null && profileID != null) {
       _usuario = Usuario(
         fullName: fullName,
         email: email,
         profileID: profileID,
       );
-      _employer = Employerrep(employerID: employerID);
+
       _isLoadingUser = false;
       notifyListeners();
     } else {
@@ -103,7 +113,7 @@ class PontoNotifier extends ChangeNotifier {
       notifyListeners();
     }
   }
-
+//SALVA AS PREFERENCIAS DO USUARIO
   Future<void> _saveUserToPrefs(Usuario usuario) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userFullName', usuario.fullName);
@@ -115,7 +125,7 @@ class PontoNotifier extends ChangeNotifier {
   File? get image => _image;
   DateTime get now => _now;
   Usuario get usuario => _usuario;
-  Employerrep get employerID => employerID;
+  Employer get employerID => employerID;
   bool get isLoadingImage => _isLoadingImage;
   bool get isLoadingUser =>
       _isLoadingUser; // Getter para o estado de carregamento do usuário
@@ -133,7 +143,7 @@ class PontoNotifier extends ChangeNotifier {
     _isLoadingImage = false;
     notifyListeners();
   }
-
+//REGISTRA O PONTO E VALIDA SE ESTA CORRETO.
   void registrarPonto(int index, BuildContext context) {
     if (pontos.where((element) => element != null).length >= 4) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -155,8 +165,7 @@ class PontoNotifier extends ChangeNotifier {
       return;
     }
 
-    if (lastPontoTime != null &&
-        now.difference(lastPontoTime!).inMinutes < 10) {
+    if (lastPontoTime != null && now.difference(lastPontoTime!).inMinutes < 1) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -173,7 +182,7 @@ class PontoNotifier extends ChangeNotifier {
 
     _savePointsLocally();
   }
-
+//VALIDA SE O PONTO ESTA ESPIRADO AO PASSAR DE UM DIA PARA OUTRO
   bool pontoExpiry() {
     final validadePonto = _expiryDate?.isAfter(DateTime.now()) ?? false;
     return validadePonto;
@@ -184,7 +193,7 @@ class PontoNotifier extends ChangeNotifier {
     _savePointsLocally();
     notifyListeners();
   }
-
+// SALVA O PONTO LOCALMENTE. 
   Future<void> _savePointsLocally() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> pontosJson = pontos
@@ -192,7 +201,7 @@ class PontoNotifier extends ChangeNotifier {
         .toList();
     await prefs.setStringList('pontos', pontosJson);
   }
-
+//FAZ O CARREGAMENTO DOS PONTOS. 
   Future<void> _loadPointsLocally() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? pontosJson = prefs.getStringList('pontos');
@@ -202,7 +211,7 @@ class PontoNotifier extends ChangeNotifier {
         List.filled(4, null);
     notifyListeners();
   }
-
+//VERIFICA SE A API DO PONTO ESTA FUNCIONANDO CORRETAMENTE. 
   Future<bool> checkApiAvailability() async {
     try {
       final response = await http.get(Uri.parse(ApiPontoService.baseUrl));

@@ -1,45 +1,44 @@
+//API PARA PEGAR O ID DO EMPLOYER
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:ponto/Service/auth_Login_Service.dart';
-import 'package:ponto/model/employerRep.dart';
 
-import '../model/usuario.dart';
 import '../utils/apiRoutes.dart';
 
 class EmployerService {
   static String? employerID;
-  Future<Employerrep?> fetchEmployer(String token, String idUser) async {
+
+  Future<void> fetchEmployer() async {
     final token = AuthService.accessToken;
     final idUser = AuthService.userId;
 
+    if (token == null || idUser == null) {
+      print('Token ou ID de usuário não disponíveis');
+      return;
+    }
+
+    final url = '$APIROUTES/employee?user=$idUser';
+
+    final headers = {
+      'Authorization': 'Bearer $token',
+    };
     try {
-      if (token == null || idUser == null) {
-        print('Token ou ID de usuário não disponíveis');
-        return null;
-      }
-
-      final url = '$APIROUTES/employee?user=$idUser';
-
-      final headers = {
-        'Authorization': 'Bearer $token',
-      };
       final response = await http.get(Uri.parse(url), headers: headers);
-      print(response.body);
+      print('Response body: ${response.body}');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return Employerrep(
-          employerID: data['_id'],
-
-          // Adicione outros campos conforme necessário
-        );
+        if (data['items'] != null && data['items'].isNotEmpty) {
+          employerID = data['items'][0]['_id'];
+          print('Employer ID: $employerID');
+        } else {
+          print('ID do empregador não encontrado na resposta');
+        }
       } else {
         print('Failed to load user data. Status code: ${response.statusCode}');
-        return null;
       }
     } catch (e) {
       print('An error occurred: $e');
-      return null;
     }
   }
 }

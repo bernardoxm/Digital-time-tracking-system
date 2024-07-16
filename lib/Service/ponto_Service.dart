@@ -1,16 +1,16 @@
+// API SE COMUNICA COM A API DE PONTO PUNCH_CLOCK
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:ponto/Service/auth_Login_Service.dart';
-import 'package:ponto/Service/auth_user_Service.dart';
 import 'package:ponto/Service/employer_Service.dart';
 import 'package:ponto/utils/apiRoutes.dart';
 
 class ApiPontoService {
-  static bool? ValidateAPIpontoService;
+  static bool? ValidateAPIpontoService = false;
   static String baseUrl = '$APIROUTES/punch-clock';
 
-  Future<bool> sendPunchClock(DateTime punchClockDate, String profileID) async {
+  Future<bool> sendPunchClock(DateTime punchClockDate) async {
     final token = AuthService.accessToken;
     final employerID = EmployerService.employerID;
 
@@ -32,15 +32,21 @@ class ApiPontoService {
         }),
       );
 
+      print('EmployerID: $employerID');
+      print('Response: ${response.body}');
+      
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        return ValidateAPIpontoService = true;
+        ValidateAPIpontoService = true;
+        return true;
       } else {
         print('Error sending punch: ${response.body}');
-        return ValidateAPIpontoService = false;
+        ValidateAPIpontoService = false;
+        return false;
       }
     } catch (e) {
       print('Exception sending punch clock: $e');
-      return ValidateAPIpontoService = false;
+      ValidateAPIpontoService = false;
+      return false;
     }
   }
 }

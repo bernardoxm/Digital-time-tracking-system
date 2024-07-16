@@ -1,10 +1,11 @@
+//TELA PONTO.DART ONDE USUARIO UTILIZA PARA BATER PONTO. 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:ponto/Service/employer_Service.dart';
 import 'package:ponto/Service/ponto_Service.dart';
 import 'package:ponto/controller/local_auth.dart';
-import 'package:ponto/model/employerRep.dart';
 import 'package:ponto/model/usuario.dart';
 import 'package:ponto/screens/perfil.dart';
 import 'package:provider/provider.dart';
@@ -13,8 +14,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../controller/ponto_notifier.dart';
 
 class Ponto extends StatelessWidget {
- 
-
   const Ponto({super.key});
 
   @override
@@ -26,6 +25,7 @@ class Ponto extends StatelessWidget {
       child: Consumer<PontoNotifier>(
         builder: (context, model, _) {
           final Usuario usuario = model.usuario;
+
           var formatterDate = DateFormat('dd/MM/yyyy');
           var formatterTime = DateFormat('HH:mm', 'pt_BR');
           String formattedDate = formatterDate.format(model.now);
@@ -276,6 +276,7 @@ class Ponto extends StatelessWidget {
                             ),
                             child: TextButton(
                               onPressed: () async {
+                                await EmployerService().fetchEmployer();
                                 bool hasBiometrics =
                                     await authController.checkBiometrics();
                                 bool authenticated = true;
@@ -288,6 +289,8 @@ class Ponto extends StatelessWidget {
                                 if (authenticated &&
                                     ApiPontoService.ValidateAPIpontoService ==
                                         true) {
+                                  // Certifique-se de buscar o employerID antes de marcar o ponto
+
                                   int index = model.pontos
                                       .indexWhere((element) => element == null);
                                   if (index != -1 && index < 4) {
@@ -300,12 +303,9 @@ class Ponto extends StatelessWidget {
                                         formatterTime.format(model.now);
 
                                     // Enviar para a API
-
                                     bool success =
                                         await ApiPontoService().sendPunchClock(
-                                      '$formattedDate $formattedTime'
-                                          as DateTime,
-                                      usuario.profileID,
+                                      model.now,
                                     );
 
                                     if (success) {
@@ -317,9 +317,7 @@ class Ponto extends StatelessWidget {
                                           duration: Duration(seconds: 2),
                                         ),
                                       );
-                                    } else if (ApiPontoService
-                                            .ValidateAPIpontoService ==
-                                        false) {
+                                    } else {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(

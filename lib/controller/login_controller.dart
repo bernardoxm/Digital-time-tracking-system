@@ -1,3 +1,4 @@
+//FAZ O CONTROLLE DO LOGIN DO USUARIO DIGITACAO E AXILIO DO ERRO 
 class LoginController {
   static String? validateEmail(String? email) {
     if (email == null || email.isEmpty) {

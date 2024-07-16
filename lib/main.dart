@@ -48,8 +48,8 @@ class MyApp extends StatelessWidget {
           ),
           useMaterial3: true,
         ),
-         home: const IntroVideoPage(),
-            
+         home: const IntroVideoPage(),// INICIA O VIDEO QUE IRA CARREGAR A PAGINA DE LOGIN LOGO APOS O TERMINO.
+            //GET PAGES REFERENTE A PAGINA QUE SERA CHAMADA UTILIZANDO O gETx
         getPages: [
           GetPage(name: AppRoutes.LOGIN, page: () => const LoginPage()),
           GetPage(name: AppRoutes.HOME, page: () => const Ponto()),

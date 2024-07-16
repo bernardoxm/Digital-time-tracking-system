@@ -1,3 +1,4 @@
+//MODEL USUARIO RETORNO DO USUARIO
 class Usuario {
   String fullName;
   String email;

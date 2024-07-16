@@ -213,6 +213,7 @@ class _LoginFormState extends State<LoginForm> {
                 //   ),
                 // ),
                 const SizedBox(height: 10),
+                
               if (!provider.isLoading)
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.7,
@@ -289,6 +290,7 @@ class _LoginFormState extends State<LoginForm> {
                   loginShowObjects(widthbox, fontSizeall, provider),
               const SizedBox(height: 10),
               if (provider.showInput)
+               if (!provider.isLoading)
                 Container(
                   width: widthbox,
                   height: MediaQuery.of(context).size.height * 0.06,

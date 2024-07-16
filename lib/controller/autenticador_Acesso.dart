@@ -1,4 +1,4 @@
-// ignore: file_names
+// CONTROLLER DE LOLGIN, ONDE APOS O LOGIN ELE IRA CHAMAR O VALIDADOR DE ACESSO. 
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {

@@ -1,3 +1,4 @@
+//CONTROLLER DO VIDIO INICIAL> 
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -16,7 +17,7 @@ class _IntroVideoScreenState extends State<IntroVideoScreen> {
     super.initState();
     _controller = VideoPlayerController.asset('assets/video/intro.mp4')
       ..initialize().then((_) {
-        // Ensure the first frame is shown after the video is initialized
+        // INICIALIZAR O VIDEO 
         setState(() {
           _controller.play();
         });

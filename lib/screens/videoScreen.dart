@@ -1,3 +1,4 @@
+//VIDEO SCREEN E A PRIMEIRA TELA DO APLICATIVO AO CARREGAR. 
  import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 

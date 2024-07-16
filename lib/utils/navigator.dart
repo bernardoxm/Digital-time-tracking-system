@@ -1,3 +1,4 @@
+//NAVIGATOR E ONDE GERA O MENU FLUTUANTE NA APLICAO. 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ponto/Service/auth_Login_Service.dart';

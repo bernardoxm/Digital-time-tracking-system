@@ -1,4 +1,4 @@
-// image_select.dart
+// CONTROLLER DA IMAGEM DO USUARIO, UTILIZA O PICK IMAGE PARA SALVAR LOCALMENTE. 
 
 import 'dart:io';
 import 'package:flutter/material.dart';

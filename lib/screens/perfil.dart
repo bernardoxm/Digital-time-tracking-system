@@ -35,7 +35,7 @@ class PerfilPageState extends State<PerfilPage> {
     _initImage();
     _initUsuario();
   }
-
+//inicia a imagem setada ou nao pelo usuario. Caso ja exista o SharedPreferences ira obtela. 
   Future<void> _initImage() async {
     await _imageSelectController.initSharedPreferences();
     File? savedImage = await _imageSelectController.getSavedImage();
@@ -53,13 +53,13 @@ class PerfilPageState extends State<PerfilPage> {
       });
     }
   }
-
+// iniciar um usuario logado.
   Future<void> _initUsuario() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? fullName = prefs.getString('userFullName');
     String? email = prefs.getString('userEmail');
     String? profileID = prefs.getString('profileid');
-    String? employerID = prefs.getString('employer');
+   
 
     if (fullName != null && email != null && profileID != null) {
       setState(() {
@@ -105,7 +105,7 @@ class PerfilPageState extends State<PerfilPage> {
       }
     }
   }
-
+//salvar perfil usuario
   Future<void> _saveUserToPrefs(Usuario usuario) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userFullName', usuario.fullName);
@@ -169,7 +169,7 @@ class PerfilPageState extends State<PerfilPage> {
                                     const Color.fromARGB(0, 255, 255, 255),
                               ),
                       ),
-                    ),
+                    ),// lista de todas as informacoes do usuario
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.5,
                       child: ListView.separated(
@@ -230,7 +230,7 @@ class PerfilPageState extends State<PerfilPage> {
       ),
     );
   }
-
+// biuld listview
   Widget _buildInfoText(String label, String value) {
     double fontSizeall = MediaQuery.of(context).size.width * 0.045;
     return Column(

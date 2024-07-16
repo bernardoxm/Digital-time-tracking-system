@@ -1,3 +1,4 @@
+//CONTROLLER DO TEMPO.
 class DataTime {
   int? sec;
   int? min;
