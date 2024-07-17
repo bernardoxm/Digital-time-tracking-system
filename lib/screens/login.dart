@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:ponto/Service/auth_user_Service.dart';
 import 'package:ponto/controller/autenticador_Acesso.dart';
+import 'package:ponto/model/usuario.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,20 +13,24 @@ import '../routes/routes.dart';
 
 class AuthProvider with ChangeNotifier {
   final AuthService _authService = AuthService();
+  final UserService _userService = UserService();
   final LocalAuthController _authController = LocalAuthController();
+
   bool _isLoading = false;
   bool _showInput = false;
   bool _isChecked = false;
-  late String _email;
-  late String _password;
-  bool _obscureText = true; // Controla a visibilidade da senha
+  String _email = '';
+  String _password = '';
+  bool _obscureText = true;
+  Usuario? _currentUser;
 
   bool get isLoading => _isLoading;
   bool get showInput => _showInput;
   bool get isChecked => _isChecked;
   String get email => _email;
   String get password => _password;
-  bool get obscureText => _obscureText; // Getter para o estado da senha
+  bool get obscureText => _obscureText;
+  Usuario? get currentUser => _currentUser;
 
   void toggleShowInput() {
     _showInput = !_showInput;
@@ -56,11 +63,9 @@ class AuthProvider with ChangeNotifier {
       await prefs.remove('password');
     }
 
-    // Salvar informações biométricas se disponível
     bool hasBiometrics = await _authController.checkBiometrics();
     if (_isChecked && hasBiometrics) {
       await prefs.setBool('hasBiometrics', true);
-      // Aqui você pode salvar mais informações biométricas, se necessário
     } else {
       await prefs.remove('hasBiometrics');
     }
@@ -87,31 +92,44 @@ class AuthProvider with ChangeNotifier {
         authenticated = await _authController.authenticate();
       }
 
-      if (LoginController.isEmailAndPasswordValid(_email, _password) &&
-          authenticated) {
-        final response = await _authService.login(_email, _password);
+      if (LoginController.isEmailAndPasswordValid(_email, _password) && authenticated) {
+        final response = await _authService.login(_email, _password, context);
 
         if (response != null) {
-          print(response);
+          final token = AuthService.accessToken;
+          final userId = AuthService.userId;
 
-          if (_isChecked) {
-            await savePreferences();
-          } else {
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.remove('keepLoggedIn');
-            prefs.remove('email');
-            prefs.remove('password');
-            prefs.remove('hasBiometrics');
+          if (token != null && userId != null) {
+            final user = await _userService.fetchUser(token, userId);
+            if (user != null) {
+              _currentUser = user;
+
+              if (_isChecked) {
+                await savePreferences();
+              } else {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.remove('keepLoggedIn');
+                prefs.remove('email');
+                prefs.remove('password');
+                prefs.remove('hasBiometrics');
+              }
+
+              _isLoading = false;
+              notifyListeners();
+              return true;
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Erro ao carregar dados do usuário.'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            }
           }
-
-          _isLoading = false;
-          notifyListeners();
-          return true; // Retorna true apenas se a autenticação e a API forem bem-sucedidas
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content:
-                  Text('Erro ao fazer login. Usuario não encontrado na base'),
+              content: Text('Erro ao fazer login. Usuário não encontrado na base'),
               duration: Duration(seconds: 2),
             ),
           );
@@ -129,8 +147,7 @@ class AuthProvider with ChangeNotifier {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content:
-              Text('Erro durante a autenticação. E-mail ou senha incorretos.'),
+          content: Text('Erro durante a autenticação. E-mail ou senha incorretos.'),
           duration: Duration(seconds: 2),
         ),
       );
@@ -153,13 +170,14 @@ class AuthProvider with ChangeNotifier {
   }
 
   void toggleShowPassword() {
-    _obscureText = !_obscureText; // Alterna a visibilidade da senha
+    _obscureText = !_obscureText;
     notifyListeners();
   }
 
-  IconData get showPasswordIcon =>
-      _obscureText ? Icons.visibility_off : Icons.visibility; // Ícone da senha
+  IconData get showPasswordIcon => _obscureText ? Icons.visibility_off : Icons.visibility;
 }
+
+
 
 final AuthService authService = AuthService();
 
@@ -191,6 +209,8 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<AuthProvider>(context);
@@ -201,19 +221,11 @@ class _LoginFormState extends State<LoginForm> {
     return Center(
       child: SingleChildScrollView(
         child: Form(
+          key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (!provider.isLoading)
-                //  Text(
-                //     'Ponto Digital',
-                //     style: TextStyle(
-                //      fontSize: MediaQuery.of(context).size.width * 0.05,
-                //      color: Colors.black,
-                //   ),
-                // ),
-                const SizedBox(height: 10),
-                
+              const SizedBox(height: 10),
               if (!provider.isLoading)
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.7,
@@ -221,43 +233,98 @@ class _LoginFormState extends State<LoginForm> {
                   child: Image.asset(
                     ("lib/assets/image/logo.png"),
                   ),
-                ),
-              //const SizedBox(height: 10),
-              if (provider.showInput)
-                if (!provider.isLoading) emailTextForm(widthbox, provider),
-              const SizedBox(height: 10),
-              if (provider.showInput)
-                if (!provider.isLoading) senhaTextForm(widthbox, provider),
+                ).animate().fade(duration: const Duration(seconds: 1)),
               if (provider.showInput)
                 if (!provider.isLoading)
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.09,
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.04,
+                  Column(
+                    children: [
+                      emailTextForm(widthbox, provider),
+                      const SizedBox(height: 10),
+                      senhaTextForm(widthbox, provider),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.09,
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.04,
+                            ),
+                            Checkbox(
+                              activeColor: Color.fromARGB(255, 0, 191, 99),
+                              checkColor: Color.fromARGB(255, 0, 191, 99),
+                              hoverColor: Color.fromARGB(255, 0, 191, 99),
+                              fillColor: WidgetStateProperty.all(
+                                const Color.fromARGB(255, 255, 255, 255),
+                              ),
+                              value: provider.isChecked,
+                              onChanged: (bool? value) {
+                                provider.setChecked(value ?? false);
+                              },
+                            ),
+                            Text(
+                              'Mantenha-me conectado',
+                              style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.04,
+                              ),
+                            ),
+                          ],
                         ),
-                        Checkbox(
-                          activeColor: Color.fromARGB(255, 0, 191, 99),
-                          checkColor: Color.fromARGB(255, 0, 191, 99),
-                          hoverColor: Color.fromARGB(255, 0, 191, 99),
-                          fillColor: WidgetStateProperty.all(
-                            const Color.fromARGB(255, 255, 255, 255),
+                      ),
+                      Container(
+                        width: widthbox,
+                        height: MediaQuery.of(context).size.height * 0.06,
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(255, 0, 191, 99),
+                          border: Border.all(
+                            color: Color.fromARGB(255, 0, 191, 99),
+                            width: 0.9,
                           ),
-                          value: provider.isChecked,
-                          onChanged: (bool? value) {
-                            provider.setChecked(value ?? false);
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(20),
+                          ),
+                        ),
+                        child: TextButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              bool isValid =
+                                  await provider.validateAccess(context);
+                              if (isValid) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      content: SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.6,
+                                        child: ValidadorAcessos(
+                                          onCodeValidated: (code) {
+                                            Navigator.of(context).pop();
+                                        
+                                            Navigator.of(context)
+                                                .pushReplacementNamed(
+                                              AppRoutes.NAVIGATORBARMENU,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              }
+                            }
                           },
-                        ),
-                        Text(
-                          'Mantenha-me conectado',
-                          style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.width * 0.04,
+                          child: Text(
+                            'Login',
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 255, 255, 255),
+                              fontSize: fontSizeall,
+                            ),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    ],
+                  ).animate().fade(duration: const Duration(seconds: 1)),
               if (provider.isLoading)
                 AlertDialog(
                   backgroundColor: Colors.transparent,
@@ -287,57 +354,9 @@ class _LoginFormState extends State<LoginForm> {
                 ),
               if (!provider.showInput)
                 if (!provider.isLoading)
-                  loginShowObjects(widthbox, fontSizeall, provider),
-              const SizedBox(height: 10),
-              if (provider.showInput)
-               if (!provider.isLoading)
-                Container(
-                  width: widthbox,
-                  height: MediaQuery.of(context).size.height * 0.06,
-                  decoration: BoxDecoration(
-                    color: Color.fromARGB(255, 0, 191, 99),
-                    border: Border.all(
-                      color: Color.fromARGB(255, 0, 191, 99),
-                      width: 0.9,
-                    ),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(20),
-                    ),
-                  ),
-                  child: TextButton(
-                    onPressed: () async {
-                      bool isValid = await provider.validateAccess(context);
-                      if (isValid) {
-                        showDialog(
-                          // ignore: use_build_context_synchronously
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              content: SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.6,
-                                child: ValidadorAcessos(
-                                  onCodeValidated: (code) {
-                                    Navigator.of(context).pop();
-                                    Navigator.of(context).pushReplacementNamed(
-                                      AppRoutes.NAVIGATORBARMENU,
-                                    );
-                                  },
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      }
-                    },
-                    child: Text(
-                      'Login',
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 255, 255, 255),
-                        fontSize: fontSizeall,
-                      ),
-                    ),
-                  ),
-                ),
+                  loginShowObjects(widthbox, fontSizeall, provider)
+                      .animate()
+                      .fade(duration: const Duration(seconds: 1)),
             ],
           ),
         ),
@@ -348,31 +367,30 @@ class _LoginFormState extends State<LoginForm> {
   Widget loginShowObjects(
       double widthbox, double fontSizeall, AuthProvider provider) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.06,
-      width: widthbox,
-      decoration: BoxDecoration(
-        color: Color.fromARGB(255, 0, 191, 99),
-        border: Border.all(
+        height: MediaQuery.of(context).size.height * 0.06,
+        width: widthbox,
+        decoration: BoxDecoration(
           color: Color.fromARGB(255, 0, 191, 99),
-          width: 0.9,
-        ),
-        borderRadius: const BorderRadius.all(
-          Radius.circular(20),
-        ),
-      ),
-      child: TextButton(
-        onPressed: () {
-          provider.toggleShowInput();
-        },
-        child: Text(
-          'Login',
-          style: TextStyle(
-            color: Color.fromARGB(255, 255, 255, 255),
-            fontSize: fontSizeall,
+          border: Border.all(
+            color: Color.fromARGB(255, 0, 191, 99),
+            width: 0.9,
+          ),
+          borderRadius: const BorderRadius.all(
+            Radius.circular(20),
           ),
         ),
-      ),
-    );
+        child: TextButton(
+          onPressed: () {
+            provider.toggleShowInput();
+          },
+          child: Text(
+            'Login',
+            style: TextStyle(
+              color: Color.fromARGB(255, 255, 255, 255),
+              fontSize: fontSizeall,
+            ),
+          ),
+        ));
   }
 
   Widget emailTextForm(double widthbox, AuthProvider provider) {
@@ -382,9 +400,7 @@ class _LoginFormState extends State<LoginForm> {
         onChanged: (value) {
           provider.setEmail(value);
         },
-        validator: (value) {
-          return LoginController.validateEmail(value!);
-        },
+        validator: (value) => LoginController.validateEmail(value),
         decoration: const InputDecoration(
           prefixIcon: Icon(Icons.email),
           hintText: 'E-mail',
@@ -393,12 +409,14 @@ class _LoginFormState extends State<LoginForm> {
             borderRadius: BorderRadius.all(
               Radius.circular(20),
             ),
-            borderSide:
-                BorderSide(width: 0.1, color: Color.fromARGB(255, 0, 191, 99)),
+            borderSide: BorderSide(
+              width: 0.1,
+              color: Color.fromARGB(255, 0, 191, 99),
+            ),
           ),
           filled: true,
         ),
-      ),
+      ).animate().shake(duration: 1.microseconds),
     );
   }
 
@@ -410,7 +428,7 @@ class _LoginFormState extends State<LoginForm> {
           provider.setPassword(value);
         },
         validator: (value) {
-          return LoginController.validatePassword(value!);
+          return LoginController.validatePassword(value);
         },
         obscureText: provider.obscureText, // Usa o estado da senha do provider
         decoration: InputDecoration(
@@ -422,13 +440,15 @@ class _LoginFormState extends State<LoginForm> {
             },
             icon: Icon(provider.showPasswordIcon), // Usa o ícone do provider
           ),
-          fillColor: Color.fromARGB(255, 255, 255, 255),
-          border: OutlineInputBorder(
+          fillColor: const Color.fromARGB(255, 255, 255, 255),
+          border: const OutlineInputBorder(
             borderRadius: BorderRadius.all(
               Radius.circular(20),
             ),
-            borderSide:
-                BorderSide(width: 0.1, color: Color.fromARGB(255, 0, 191, 99)),
+            borderSide: BorderSide(
+              width: 0.1,
+              color: Color.fromARGB(255, 0, 191, 99),
+            ),
           ),
           filled: true,
         ),
@@ -436,3 +456,4 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 }
+

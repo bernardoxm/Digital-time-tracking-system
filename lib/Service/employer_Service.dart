@@ -1,13 +1,11 @@
-//API PARA PEGAR O ID DO EMPLOYER
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:ponto/Service/auth_Login_Service.dart';
-
-import '../utils/apiRoutes.dart';
+import 'package:ponto/utils/apiRoutes.dart';
 
 class EmployerService {
-  static String? employerID;
+  static String employerID = '';
 
   Future<void> fetchEmployer() async {
     final token = AuthService.accessToken;
@@ -32,6 +30,7 @@ class EmployerService {
           employerID = data['items'][0]['_id'];
           print('Employer ID: $employerID');
         } else {
+          employerID = ''; // Limpar o employerID se a resposta estiver vazia
           print('ID do empregador não encontrado na resposta');
         }
       } else {
@@ -40,5 +39,9 @@ class EmployerService {
     } catch (e) {
       print('An error occurred: $e');
     }
+  }
+
+  static void clearEmployerID() {
+    employerID = '';
   }
 }

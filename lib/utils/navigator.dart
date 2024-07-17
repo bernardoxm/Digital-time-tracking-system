@@ -1,5 +1,6 @@
 //NAVIGATOR E ONDE GERA O MENU FLUTUANTE NA APLICAO. 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:ponto/controller/navigator_Controller.dart';
 import 'package:ponto/controller/ponto_notifier.dart';
@@ -69,6 +70,6 @@ class NavigatorBarMenu extends StatelessWidget {
         ),
       ),
       body: Obx(() => controller.screens[controller.selectedIndex.value]),
-    );
+    ).animate().fade(duration: const Duration(milliseconds: 400));
   }
 }

@@ -17,4 +17,6 @@ class Usuario {
       profileID: json['_id'],
     );
   }
+
+
 }

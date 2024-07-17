@@ -1,6 +1,7 @@
 // CONTROLLER DA IMAGEM DO USUARIO, UTILIZA O PICK IMAGE PARA SALVAR LOCALMENTE. 
 
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -54,5 +55,15 @@ class ImageSelectController {
       return File(imagePath);
     }
     return null;
+    
   }
-}
+  Future<void> deleteSavedImage() async {
+    String? imagePath = _prefs.getString('profile_image_path');
+    if (imagePath != null) {
+      File file = File(imagePath);
+      if (await file.exists()) {
+        await file.delete();
+      }
+      _prefs.remove('profile_image_path');
+    }
+}}

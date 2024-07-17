@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:ponto/Service/auth_Login_Service.dart';
 import 'package:ponto/Service/auth_user_Service.dart';
@@ -228,7 +229,7 @@ class PerfilPageState extends State<PerfilPage> {
           ],
         ),
       ),
-    );
+    ).animate().fade(duration: const Duration(milliseconds: 400));
   }
 // biuld listview
   Widget _buildInfoText(String label, String value) {

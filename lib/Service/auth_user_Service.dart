@@ -8,9 +8,11 @@ import '../model/usuario.dart';
 import '../utils/apiRoutes.dart';
 
 class UserService {
+  
   Future<Usuario?> fetchUser(String token, String idUser) async {
     final token = AuthService.accessToken;
     final idUser = AuthService.userId;
+    
 
     try {
       if (token == null || idUser == null) {
@@ -27,10 +29,12 @@ class UserService {
       print(response.body);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+       
         return Usuario(
           fullName: data['fullName'],
           email: data['emailAccess'],
           profileID: data['_id'],
+          
 
           // Adicione outros campos conforme necessário
         );

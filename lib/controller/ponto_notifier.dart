@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
+import 'package:ponto/Service/Ponto_Get_Service.dart';
 import 'package:ponto/Service/auth_Login_Service.dart';
 import 'package:ponto/Service/auth_user_Service.dart';
 import 'package:ponto/Service/ponto_Service.dart';
@@ -13,13 +13,13 @@ import 'package:ponto/model/employer.dart';
 import 'package:ponto/model/usuario.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-//PONTO NOTIFIER, SE TRATA DA APLICACAO ESTA NO ESTADO StatelessWidget ESSA PARTE FAZ TODA A MUDANCA DA APLICAO, COMO MUDANCA DO RELOGIO, OU QUALQUER ATIVIDADE FEITA PELO USUARIO.
+
+
 class PontoNotifier extends ChangeNotifier {
   late Timer _timer;
   DateTime _now = DateTime.now();
   bool _isLoadingImage = false;
   bool _isLoadingUser = true;
-  DateFormat? _formatterDay;
   File? _image;
   late ImageSelectController _imageSelectController;
   final LocalAuthController _authController = LocalAuthController();
@@ -33,10 +33,13 @@ class PontoNotifier extends ChangeNotifier {
   PontoNotifier(this._context) {
     _imageSelectController = ImageSelectController();
     pontoExpiry();
+    _initUsuario();
     _initImage();
     _loadPointsLocally();
-    _initUsuario();
+
     _employerlading();
+    _fetchPontosDoDia(); // Fetch pontos do dia atual
+
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _now = DateTime.now();
       notifyListeners();
@@ -76,7 +79,8 @@ class PontoNotifier extends ChangeNotifier {
     String? profileID = prefs.getString('profileID');
 
     if (fullName != null && email != null && profileID != null) {
-      _usuario = Usuario(fullName: fullName, email: email, profileID: profileID);
+      _usuario =
+          Usuario(fullName: fullName, email: email, profileID: profileID);
       _isLoadingUser = false;
       notifyListeners();
     } else {
@@ -88,7 +92,10 @@ class PontoNotifier extends ChangeNotifier {
         _usuario = (await userService.fetchUser(token, idUser))!;
         _saveUserToPrefs(_usuario);
       } else {
-        _usuario = Usuario(fullName: 'ERRO GET USER', email: 'ERRO GET USER', profileID: 'ERRO GET ID');
+        _usuario = Usuario(
+            fullName: 'ERRO GET USER',
+            email: 'ERRO GET USER',
+            profileID: 'ERRO GET ID');
       }
 
       _isLoadingUser = false;
@@ -100,6 +107,7 @@ class PontoNotifier extends ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userFullName', usuario.fullName);
     await prefs.setString('userEmail', usuario.email);
+    await prefs.setString('profileID', usuario.profileID);
   }
 
   DateTime? lastPontoTime;
@@ -127,21 +135,28 @@ class PontoNotifier extends ChangeNotifier {
   void registrarPonto(int index, BuildContext context) {
     if (pontos.where((element) => element != null).length >= 4) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Você já marcou os 4 pontos hoje.'), duration: Duration(seconds: 2)),
+        const SnackBar(
+            content: Text('Você já marcou os 4 pontos hoje.'),
+            duration: Duration(seconds: 2)),
       );
       return;
     }
 
     if (pontos[index] != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Este ponto já foi marcado.'), duration: Duration(seconds: 2)),
+        const SnackBar(
+            content: Text('Este ponto já foi marcado.'),
+            duration: Duration(seconds: 2)),
       );
       return;
     }
 
     if (lastPontoTime != null && now.difference(lastPontoTime!).inMinutes < 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Você precisa esperar pelo menos 1 minuto para marcar o próximo ponto.'), duration: Duration(seconds: 2)),
+        const SnackBar(
+            content: Text(
+                'Você precisa esperar pelo menos 1 minuto para marcar o próximo ponto.'),
+            duration: Duration(seconds: 2)),
       );
       return;
     }
@@ -165,15 +180,68 @@ class PontoNotifier extends ChangeNotifier {
 
   Future<void> _savePointsLocally() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> pontosJson = pontos.map((point) => point != null ? point.toIso8601String() : '').toList();
+    List<String> pontosJson = pontos
+        .map((point) => point != null ? point.toIso8601String() : '')
+        .toList();
     await prefs.setStringList('pontos', pontosJson);
   }
 
   Future<void> _loadPointsLocally() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? pontosJson = prefs.getStringList('pontos');
-    pontos = pontosJson?.map((point) => point.isNotEmpty ? DateTime.parse(point) : null).toList() ?? List.filled(4, null);
+    pontos = pontosJson
+            ?.map((point) => point.isNotEmpty ? DateTime.parse(point) : null)
+            .toList() ??
+        List.filled(4, null);
     notifyListeners();
+  }
+
+  Future<void> _fetchPontosDoDia() async {
+    isLoading = true;
+    notifyListeners();
+    
+    final pontosList = await PontoGetService().fetchPontosDoDia();
+    if (pontosList != null && pontosList.isNotEmpty) {
+      print('Pontos recebidos da API: $pontosList');
+      
+      // Ordenar os pontos por hora antes de atualizá-los
+      pontosList.sort((a, b) => DateTime.parse(a.punchClockDate).compareTo(DateTime.parse(b.punchClockDate)));
+      
+      pontos = List.filled(4, null); // Reseta os pontos
+      for (var i = 0; i < pontosList.length && i < 4; i++) {
+        pontos[i] = DateTime.parse(pontosList[i].punchClockDate);
+      }
+    } else {
+      print('Nenhum ponto recebido da API ou lista vazia.');
+      limparPontos(); // Limpar pontos se a lista da API estiver vazia
+    }
+
+    isLoading = false;
+    notifyListeners();
+  }
+
+  void clearData() {
+    _usuario = Usuario(fullName: '', email: '', profileID: '');
+    _employer = Employer(employerID: '');
+    limparPontos();
+    _image = null;
+    imageProvider = null;
+    notifyListeners();
+  }
+
+  int getIndexFromStatus(String status) {
+    switch (status) {
+      case 'Entrada':
+        return 0;
+      case 'Almoço':
+        return 1;
+      case 'Volta Almoço':
+        return 2;
+      case 'Saída':
+        return 3;
+      default:
+        return -1;
+    }
   }
 
   Future<bool> checkApiAvailability() async {
@@ -194,11 +262,10 @@ class PontoNotifier extends ChangeNotifier {
     super.dispose();
   }
 
-  static void logout(PontoNotifier instance) {
-    instance._usuario = Usuario(fullName: '', email: '', profileID: '');
-    instance._employer = Employer(employerID: '');
-    instance.imageProvider = const AssetImage("lib/assets/image/defaultprofile.png");
-    instance.limparPontos();
-    instance.notifyListeners();
+  static Future<void> logout(PontoNotifier instance) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Limpar todos os dados do SharedPreferences
+
+    instance.clearData();
   }
 }
