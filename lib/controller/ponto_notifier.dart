@@ -13,8 +13,6 @@ import 'package:ponto/model/employer.dart';
 import 'package:ponto/model/usuario.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
-
 class PontoNotifier extends ChangeNotifier {
   late Timer _timer;
   DateTime _now = DateTime.now();
@@ -27,6 +25,7 @@ class PontoNotifier extends ChangeNotifier {
   late Employer _employer = Employer(employerID: '');
   late BuildContext _context;
   DateTime? _expiryDate;
+  bool pontosDodiaIsloading = false;
 
   List<DateTime?> pontos = List.filled(4, null);
 
@@ -36,7 +35,6 @@ class PontoNotifier extends ChangeNotifier {
     _initUsuario();
     _initImage();
     _loadPointsLocally();
-
     _employerlading();
     _fetchPontosDoDia(); // Fetch pontos do dia atual
 
@@ -55,12 +53,11 @@ class PontoNotifier extends ChangeNotifier {
     if (savedImage != null) {
       _image = savedImage;
       imageProvider = FileImage(savedImage);
-      isLoading = false;
-      notifyListeners();
     } else {
       imageProvider = const AssetImage("lib/assets/image/defaultprofile.png");
-      isLoading = false;
     }
+    isLoading = false;
+    notifyListeners();
   }
 
   void _employerlading() async {
@@ -126,6 +123,7 @@ class PontoNotifier extends ChangeNotifier {
     File? pickedImage = await _imageSelectController.pickImage(context);
     if (pickedImage != null) {
       _image = pickedImage;
+      imageProvider = FileImage(pickedImage);
     }
 
     _isLoadingImage = false;
@@ -197,9 +195,9 @@ class PontoNotifier extends ChangeNotifier {
   }
 
   Future<void> _fetchPontosDoDia() async {
-    isLoading = true;
+    pontosDodiaIsloading = true;
     notifyListeners();
-    
+
     final pontosList = await PontoGetService().fetchPontosDoDia();
     if (pontosList != null && pontosList.isNotEmpty) {
       print('Pontos recebidos da API: $pontosList');
@@ -216,7 +214,7 @@ class PontoNotifier extends ChangeNotifier {
       limparPontos(); // Limpar pontos se a lista da API estiver vazia
     }
 
-    isLoading = false;
+    pontosDodiaIsloading = false;
     notifyListeners();
   }
 

@@ -24,14 +24,20 @@ class NavigatorBarMenu extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.topRight,
               colors: [
-                Color.fromARGB(255, 0, 191, 99),
-                Color.fromARGB(255, 0, 191, 99),
+                  Color.fromARGB(255, 57, 146, 247),
+                      Color.fromARGB(255, 0, 191, 99),
               ],
             ),
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
-            ),
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),boxShadow: [
+                       BoxShadow(
+                        color: Color.fromARGB(96, 52, 52, 52),
+                        
+                        blurRadius: 5,
+                      ),
+                    ],
           ),
           child: NavigationBar(
             indicatorColor: Color.fromARGB(255, 0, 245, 126),

@@ -274,7 +274,13 @@ class _LoginFormState extends State<LoginForm> {
                         width: widthbox,
                         height: MediaQuery.of(context).size.height * 0.06,
                         decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 0, 191, 99),
+                         gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                          colors: [
+                                            Color.fromARGB(255, 57, 146, 247),
+                                            Color.fromARGB(255, 0, 191, 99),
+                                          ]),
                           border: Border.all(
                             color: Color.fromARGB(255, 0, 191, 99),
                             width: 0.9,
@@ -370,7 +376,13 @@ class _LoginFormState extends State<LoginForm> {
         height: MediaQuery.of(context).size.height * 0.06,
         width: widthbox,
         decoration: BoxDecoration(
-          color: Color.fromARGB(255, 0, 191, 99),
+         gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                          colors: [
+                                            Color.fromARGB(255, 57, 146, 247),
+                                            Color.fromARGB(255, 0, 191, 99),
+                                          ]),
           border: Border.all(
             color: Color.fromARGB(255, 0, 191, 99),
             width: 0.9,

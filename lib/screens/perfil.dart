@@ -130,14 +130,20 @@ class PerfilPageState extends State<PerfilPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Color.fromARGB(255, 0, 191, 99),
+                      Color.fromARGB(255, 57, 146, 247),
                       Color.fromARGB(255, 0, 191, 99),
                     ],
                   ),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(100),
                     bottomRight: Radius.circular(0),
-                  ),
+                  ),boxShadow: [
+                       BoxShadow(
+                        color: Color.fromARGB(96, 52, 52, 52),
+                        
+                        blurRadius: 5,
+                      ),
+                    ],
                 ),
                 child: Column(
                   children: [
