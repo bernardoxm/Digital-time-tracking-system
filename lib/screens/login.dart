@@ -248,18 +248,7 @@ class _LoginFormState extends State<LoginForm> {
                             SizedBox(
                               width: MediaQuery.of(context).size.width * 0.04,
                             ),
-                            Checkbox(
-                              activeColor: Color.fromARGB(255, 0, 191, 99),
-                              checkColor: Color.fromARGB(255, 0, 191, 99),
-                              hoverColor: Color.fromARGB(255, 0, 191, 99),
-                              fillColor: WidgetStateProperty.all(
-                                const Color.fromARGB(255, 255, 255, 255),
-                              ),
-                              value: provider.isChecked,
-                              onChanged: (bool? value) {
-                                provider.setChecked(value ?? false);
-                              },
-                            ),
+                            checkboxConected(provider),
                             Text(
                               'Mantenha-me conectado',
                               style: TextStyle(
@@ -270,65 +259,7 @@ class _LoginFormState extends State<LoginForm> {
                           ],
                         ),
                       ),
-                      Container(
-                        width: widthbox,
-                        height: MediaQuery.of(context).size.height * 0.06,
-                        decoration: BoxDecoration(
-                         gradient: LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                          colors: [
-                                            Color.fromARGB(255, 57, 146, 247),
-                                            Color.fromARGB(255, 0, 191, 99),
-                                          ]),
-                          border: Border.all(
-                            color: Color.fromARGB(255, 0, 191, 99),
-                            width: 0.9,
-                          ),
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(20),
-                          ),
-                        ),
-                        child: TextButton(
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              bool isValid =
-                                  await provider.validateAccess(context);
-                              if (isValid) {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      content: SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.6,
-                                        child: ValidadorAcessos(
-                                          onCodeValidated: (code) {
-                                            Navigator.of(context).pop();
-                                        
-                                            Navigator.of(context)
-                                                .pushReplacementNamed(
-                                              AppRoutes.NAVIGATORBARMENU,
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              }
-                            }
-                          },
-                          child: Text(
-                            'Login',
-                            style: TextStyle(
-                              color: Color.fromARGB(255, 255, 255, 255),
-                              fontSize: fontSizeall,
-                            ),
-                          ),
-                        ),
-                      ),
+                      Login(widthbox, context, provider, fontSizeall),
                     ],
                   ).animate().fade(duration: const Duration(seconds: 1)),
               if (provider.isLoading)
@@ -370,13 +301,94 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
+
+
+  
+
+  Checkbox checkboxConected(AuthProvider provider) {
+    return Checkbox(
+                            activeColor: Color.fromARGB(255, 0, 191, 99),
+                            checkColor: Color.fromARGB(255, 0, 191, 99),
+                            hoverColor: Color.fromARGB(255, 0, 191, 99),
+                            fillColor: WidgetStateProperty.all(
+                              const Color.fromARGB(255, 255, 255, 255),
+                            ),
+                            value: provider.isChecked,
+                            onChanged: (bool? value) {
+                              provider.setChecked(value ?? false);
+                            },
+                          );
+  }
+
+  Container Login(double widthbox, BuildContext context, AuthProvider provider, double fontSizeall) {
+    return Container(
+                      width: widthbox,
+                      height:  MediaQuery.of(context).size.height * 0.07,
+                      decoration: BoxDecoration(
+                       gradient: const LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Color.fromARGB(255, 57, 146, 247),
+                                          Color.fromARGB(255, 0, 191, 99),
+                                        ]),
+                        border: Border.all(
+                          color: const Color.fromARGB(255, 0, 191, 99),
+                          width: 0.9,
+                        ),
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(20),
+                        ),
+                      ),
+                      child: TextButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            bool isValid =
+                                await provider.validateAccess(context);
+                            if (isValid) {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    content: SizedBox(
+                                      width:
+                                          MediaQuery.of(context).size.width *
+                                              0.6,
+                                      child: ValidadorAcessos(
+                                        onCodeValidated: (code) {
+                                          Navigator.of(context).pop();
+                                      
+                                          Navigator.of(context)
+                                              .pushReplacementNamed(
+                                            AppRoutes.NAVIGATORBARMENU,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                          }
+                        },
+                        child: Text(
+                          'Login',
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 255, 255, 255),
+                            fontSize: fontSizeall,
+                          ),
+                        ),
+                      ),
+                    );
+  }
+
   Widget loginShowObjects(
       double widthbox, double fontSizeall, AuthProvider provider) {
     return Container(
-        height: MediaQuery.of(context).size.height * 0.06,
+        height: MediaQuery.of(context).size.height * 0.07,
         width: widthbox,
         decoration: BoxDecoration(
-         gradient: LinearGradient(
+         gradient: const LinearGradient(
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
                                           colors: [
@@ -384,7 +396,7 @@ class _LoginFormState extends State<LoginForm> {
                                             Color.fromARGB(255, 0, 191, 99),
                                           ]),
           border: Border.all(
-            color: Color.fromARGB(255, 0, 191, 99),
+            color: const Color.fromARGB(255, 0, 191, 99),
             width: 0.9,
           ),
           borderRadius: const BorderRadius.all(
@@ -398,7 +410,7 @@ class _LoginFormState extends State<LoginForm> {
           child: Text(
             'Login',
             style: TextStyle(
-              color: Color.fromARGB(255, 255, 255, 255),
+              color: const Color.fromARGB(255, 255, 255, 255),
               fontSize: fontSizeall,
             ),
           ),

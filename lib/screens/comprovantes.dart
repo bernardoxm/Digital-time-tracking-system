@@ -13,31 +13,29 @@ class _Comprovantes extends State<Comprovantes> {
 
     return Scaffold(
       body: SingleChildScrollView(
-        child: SafeArea(
-          child: Container(
-            width: MediaQuery.of(context).size.width * 1,
-            height: buttompading,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                 Color.fromARGB(255, 57, 146, 247),
-                              Color.fromARGB(255, 0, 191, 99),
-                ],
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(100),
-                bottomRight: Radius.circular(000),
-              ),
+        child: Container(
+          width: MediaQuery.of(context).size.width * 1,
+          height: buttompading,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+               Color.fromARGB(255, 57, 146, 247),
+                            Color.fromARGB(255, 0, 191, 99),
+              ],
             ),
-            child: Center(
-              child: Text(
-                'Comprovantes',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: MediaQuery.of(context).size.width * 0.05),
-              ),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(30),
+              bottomRight: Radius.circular(30),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              'Comprovantes',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: MediaQuery.of(context).size.width * 0.05),
             ),
           ),
         ),

@@ -123,81 +123,79 @@ class PerfilPageState extends State<PerfilPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SafeArea(
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color.fromARGB(255, 57, 146, 247),
-                      Color.fromARGB(255, 0, 191, 99),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(100),
-                    bottomRight: Radius.circular(0),
-                  ),boxShadow: [
-                       BoxShadow(
-                        color: Color.fromARGB(96, 52, 52, 52),
-                        
-                        blurRadius: 5,
-                      ),
-                    ],
-                ),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.1,
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      child: GestureDetector(
-                        onTap: () async {
-                          File? pickedImage =
-                              await _imageSelectController.pickImage(context);
-
-                          if (pickedImage != null) {
-                            setState(() {
-                              image = pickedImage;
-                              _imageProvider = FileImage(pickedImage);
-                            });
-                          }
-                        },
-                        child: _isLoading
-                            ? const CircularProgressIndicator()
-                            : CircleAvatar(
-                                key: UniqueKey(),
-                                radius: 75,
-                                backgroundColor: Colors.transparent,
-                                backgroundImage: _imageProvider,
-                                foregroundColor:
-                                    const Color.fromARGB(0, 255, 255, 255),
-                              ),
-                      ),
-                    ),// lista de todas as informacoes do usuario
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.5,
-                      child: ListView.separated(
-                        itemBuilder: (BuildContext context, int index) {
-                          return ListTile(
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildInfoText('Nome', _usuario.fullName),
-                                _buildInfoText('Email', _usuario.email),
-                              ],
-                            ),
-                          );
-                        },
-                        padding: const EdgeInsets.all(20),
-                        separatorBuilder: (_, __) => const Divider(),
-                        itemCount: 1,
-                      ),
-                    ),
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color.fromARGB(255, 57, 146, 247),
+                    Color.fromARGB(255, 0, 191, 99),
                   ],
                 ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
+                ),boxShadow: [
+                     BoxShadow(
+                      color: Color.fromARGB(96, 52, 52, 52),
+                      
+                      blurRadius: 5,
+                    ),
+                  ],
+              ),
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.1,
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.5,
+                    height: MediaQuery.of(context).size.height * 0.3,
+                    child: GestureDetector(
+                      onTap: () async {
+                        File? pickedImage =
+                            await _imageSelectController.pickImage(context);
+            
+                        if (pickedImage != null) {
+                          setState(() {
+                            image = pickedImage;
+                            _imageProvider = FileImage(pickedImage);
+                          });
+                        }
+                      },
+                      child: _isLoading
+                          ? const CircularProgressIndicator()
+                          : CircleAvatar(
+                              key: UniqueKey(),
+                              radius: 75,
+                              backgroundColor: Colors.transparent,
+                              backgroundImage: _imageProvider,
+                              foregroundColor:
+                                  const Color.fromARGB(0, 255, 255, 255),
+                            ),
+                    ),
+                  ),// lista de todas as informacoes do usuario
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    child: ListView.separated(
+                      itemBuilder: (BuildContext context, int index) {
+                        return ListTile(
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildInfoText('Nome', _usuario.fullName),
+                              _buildInfoText('Email', _usuario.email),
+                            ],
+                          ),
+                        );
+                      },
+                      padding: const EdgeInsets.all(20),
+                      separatorBuilder: (_, __) => const Divider(),
+                      itemCount: 1,
+                    ),
+                  ),
+                ],
               ),
             ),
             SizedBox(

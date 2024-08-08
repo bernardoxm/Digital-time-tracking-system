@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
@@ -40,7 +41,8 @@ class MyApp extends StatelessWidget {
 
           navigationBarTheme: NavigationBarThemeData(
             labelTextStyle: WidgetStateProperty.all(
-              const TextStyle(color: Colors.white),
+              
+              const TextStyle(color: Colors.white, ),
             ),
           ),
           scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
