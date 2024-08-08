@@ -29,12 +29,12 @@ class MyApp extends StatelessWidget {
       create: (_) =>
           PontoNotifier(context), // Cria uma instância de PontoNotifier
       child: GetMaterialApp(
-        // Use GetMaterialApp em vez de MaterialApp
-        // localizationsDelegates: const [
-        //   GlobalMaterialLocalizations.delegate,
-        //   GlobalWidgetsLocalizations.delegate
-        // ],
-        // supportedLocales: const [Locale('pt', 'BR')],
+       
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate
+        ],
+        supportedLocales: const [Locale('pt', 'BR')],
         title: 'Ponto Digital',
         theme: ThemeData(        
 
