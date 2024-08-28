@@ -159,8 +159,27 @@ class Ponto extends StatelessWidget {
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.1,
                     child: model.pontosDodiaIsloading
-                        ? const Center(
-                            child: CircularProgressIndicator(),
+                        ?  Center(
+                            child:  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Image.asset(
+                        "lib/assets/image/logo.png",
+                        fit: BoxFit.cover,
+                        height: 50,
+                        width: 50,
+                      ),
+                      const SizedBox(
+                        width: 70,
+                        height: 70,
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              Color.fromARGB(255, 0, 191, 99)),
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    ],
+                  ),
                           )
                         : (model.pontos.isEmpty ||
                                 model.pontos.every((ponto) => ponto == null))
