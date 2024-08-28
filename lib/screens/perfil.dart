@@ -178,9 +178,28 @@ class PerfilPageState extends State<PerfilPage> {
                   ),// lista de todas as informacoes do usuario
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.5,
-                    child: ListView.separated(
+                    child: _isLoading? Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Image.asset(
+                        "lib/assets/image/logo.png",
+                        fit: BoxFit.cover,
+                        height: 50,
+                        width: 50,
+                      ),
+                      const SizedBox(
+                        width: 70,
+                        height: 70,
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              Color.fromARGB(255, 0, 191, 99)),
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    ],
+                  ) :ListView.separated(
                       itemBuilder: (BuildContext context, int index) {
-                        return ListTile(
+                        return ListTile( 
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [

@@ -25,7 +25,7 @@ class PontoNotifier extends ChangeNotifier {
   late Employer _employer = Employer(employerID: '');
   late BuildContext _context;
   DateTime? _expiryDate;
-  bool pontosDodiaIsloading = false;
+  bool pontosDodiaIsloading = true;
 
   List<DateTime?> pontos = List.filled(4, null);
 
@@ -36,7 +36,9 @@ class PontoNotifier extends ChangeNotifier {
     _initImage();
     _loadPointsLocally();
     _employerlading();
-    _fetchPontosDoDia(); // Fetch pontos do dia atual
+
+    // Adicionado: Fetch pontos do dia atual
+    fetchPontosDoDia(); 
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _now = DateTime.now();
@@ -194,7 +196,7 @@ class PontoNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _fetchPontosDoDia() async {
+  Future<void> fetchPontosDoDia() async {
     pontosDodiaIsloading = true;
     notifyListeners();
 

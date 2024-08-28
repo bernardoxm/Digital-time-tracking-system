@@ -20,8 +20,7 @@ class Ponto extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LocalAuthController authController = LocalAuthController();
-    EmployerService()
-        .fetchEmployer(); // Certifique-se de buscar o employerID antes de marcar o ponto
+    EmployerService().fetchEmployer(); // Certifique-se de buscar o employerID antes de marcar o ponto
     return ChangeNotifierProvider(
       create: (_) => PontoNotifier(context),
       child: Consumer<PontoNotifier>(
@@ -133,8 +132,7 @@ class Ponto extends StatelessWidget {
                         Text(
                           formattedDate,
                           style: TextStyle(
-                              color:
-                                  const Color.fromARGB(255, 255, 255, 255),
+                              color: const Color.fromARGB(255, 255, 255, 255),
                               fontSize:
                                   MediaQuery.of(context).size.width * 0.04),
                         ),
@@ -161,140 +159,294 @@ class Ponto extends StatelessWidget {
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.1,
                     child: model.pontosDodiaIsloading
-                        ? Stack(alignment: Alignment.center, children: [
-                            Image.asset(
-                              "lib/assets/image/logo.png",
-                              fit: BoxFit.cover,
-                              height: 50,
-                              width: 50,
-                            ),
-              
-                            // Indicador de progresso centralizado sobre a logo
-                            const SizedBox(
-                              width: 70,
-                              height: 70,
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    Color.fromARGB(255, 0, 191, 99)),
-                                strokeWidth: 2,
-                              ),
-                            ),
-                          ])
-                        : SingleChildScrollView( scrollDirection: Axis.horizontal,
-                          child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: List.generate(4, (index) {
-                                Widget pontoWidget;
-                                String pontoTexto;
-                                String horaFormatada = '--:--';
-                          
-                                switch (index) {
-                                  case 0:
-                                    pontoTexto = 'Entrada';
-                                    break;
-                                  case 1:
-                                    pontoTexto = 'Almoço';
-                                    break;
-                                  case 2:
-                                    pontoTexto = 'Volta Almoço';
-                                    break;
-                                  case 3:
-                                    pontoTexto = 'Saída';
-                                    break;
-                                  default:
-                                    pontoTexto = '--:--';
-                                }
-                          
-                                if (model.pontos[index] != null) {
-                                  horaFormatada = DateFormat.Hm()
-                                      .format(model.pontos[index]!);
-                                }
-                          
-                                pontoWidget = GestureDetector(
-                                  onTap: () async {
-                                    bool hasBiometrics =
-                                        await authController.checkBiometrics();
-                                    bool authenticated = true;
-                          
-                                    if (hasBiometrics) {
-                                      authenticated =
-                                          await authController.authenticate();
-                                    }
-                          
-                                    if (authenticated) {
-                                      model.registrarPonto(index, context);
-                                    } else {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Não autenticado. O ponto não foi marcado.'),
-                                          duration: Duration(seconds: 2),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  child: Container(height: MediaQuery.of(context).size.height * 0.1,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 27, vertical: 10),
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                          colors: [
-                                            Color.fromARGB(255, 57, 146, 247),
-                                            Color.fromARGB(255, 0, 191, 99),
-                                          ]),
-                                      color: model.pontos[index] != null
-                                          ? const Color.fromARGB(
-                                              255, 0, 191, 99)
-                                          : const Color.fromARGB(
-                                              33, 0, 191, 99),
-                                      borderRadius: BorderRadius.circular(8),
-                                      // boxShadow: [
-                                      //   BoxShadow(
-                                      //     color: Color.fromARGB(96, 52, 52, 52),
-                                      //     blurRadius: 5,
-                                      //   ),
-                                      // ],
-                                    ),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          pontoTexto,
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: model.pontos[index] != null
-                                                ? Colors.white
-                                                : Colors.black,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          horaFormatada,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: model.pontos[index] != null
-                                                ? Colors.white
-                                                : Colors.black,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                          
-                                return Row(
-                                  children: [SizedBox(width: 4,),
-                                    pontoWidget,
-                                    if (index < 3) const SizedBox(width: 10),
-                                    SizedBox(width: 2,),
-                                  ],
-                                );
-                              }).toList(),
-                            ),
+                        ? const Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : (model.pontos.isEmpty ||
+                                model.pontos.every((ponto) => ponto == null))
+                            ? FutureBuilder(
+                                future: model.fetchPontosDoDia(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Center(
+                                      child:  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Image.asset(
+                        "lib/assets/image/logo.png",
+                        fit: BoxFit.cover,
+                        height: 50,
+                        width: 50,
+                      ),
+                      const SizedBox(
+                        width: 70,
+                        height: 70,
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              Color.fromARGB(255, 0, 191, 99)),
+                          strokeWidth: 2,
                         ),
+                      ),
+                    ],
+                  )
+                                    );
+                                  } else if (snapshot.hasError) {
+                                    return const Center(
+                                      child: Text(
+                                          "Erro ao carregar os pontos. Tente novamente."),
+                                    );
+                                  } else {
+                                    return SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: List.generate(4, (index) {
+                                          Widget pontoWidget;
+                                          String pontoTexto;
+                                          String horaFormatada = '--:--';
+
+                                          switch (index) {
+                                            case 0:
+                                              pontoTexto = 'Entrada';
+                                              break;
+                                            case 1:
+                                              pontoTexto = 'Almoço';
+                                              break;
+                                            case 2:
+                                              pontoTexto = 'Volta Almoço';
+                                              break;
+                                            case 3:
+                                              pontoTexto = 'Saída';
+                                              break;
+                                            default:
+                                              pontoTexto = '--:--';
+                                          }
+
+                                          if (model.pontos[index] != null) {
+                                            horaFormatada = DateFormat.Hm()
+                                                .format(model.pontos[index]!);
+                                          }
+
+                                          pontoWidget = GestureDetector(
+                                            onTap: () async {
+                                              bool hasBiometrics =
+                                                  await authController
+                                                      .checkBiometrics();
+                                              bool authenticated = true;
+
+                                              if (hasBiometrics) {
+                                                authenticated = await authController
+                                                    .authenticate();
+                                              }
+
+                                              if (authenticated) {
+                                                model.registrarPonto(
+                                                    index, context);
+                                              } else {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                        'Não autenticado. O ponto não foi marcado.'),
+                                                    duration:
+                                                        Duration(seconds: 2),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                            child: Container(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.1,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 27,
+                                                      vertical: 10),
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                    begin: Alignment.topLeft,
+                                                    end:
+                                                        Alignment.bottomRight,
+                                                    colors: [
+                                                      Color.fromARGB(
+                                                          255, 57, 146, 247),
+                                                      Color.fromARGB(
+                                                          255, 0, 191, 99),
+                                                    ]),
+                                                color:
+                                                    model.pontos[index] != null
+                                                        ? const Color.fromARGB(
+                                                            255, 0, 191, 99)
+                                                        : const Color.fromARGB(
+                                                            33, 0, 191, 99),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    pontoTexto,
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: model.pontos[
+                                                                  index] !=
+                                                              null
+                                                          ? Colors.white
+                                                          : Colors.black,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    horaFormatada,
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: model.pontos[
+                                                                  index] !=
+                                                              null
+                                                          ? Colors.white
+                                                          : Colors.black,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+
+                                          return Row(
+                                            children: [
+                                              SizedBox(width: 4,),
+                                              pontoWidget,
+                                              if (index < 3) const SizedBox(width: 10),
+                                              SizedBox(width: 2,),
+                                            ],
+                                          );
+                                        }).toList(),
+                                      ),
+                                    );
+                                  }
+                                },
+                              )
+                            : SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: List.generate(4, (index) {
+                                    Widget pontoWidget;
+                                    String pontoTexto;
+                                    String horaFormatada = '--:--';
+
+                                    switch (index) {
+                                      case 0:
+                                        pontoTexto = 'Entrada';
+                                        break;
+                                      case 1:
+                                        pontoTexto = 'Almoço';
+                                        break;
+                                      case 2:
+                                        pontoTexto = 'Volta Almoço';
+                                        break;
+                                      case 3:
+                                        pontoTexto = 'Saída';
+                                        break;
+                                      default:
+                                        pontoTexto = '--:--';
+                                    }
+
+                                    if (model.pontos[index] != null) {
+                                      horaFormatada = DateFormat.Hm()
+                                          .format(model.pontos[index]!);
+                                    }
+
+                                    pontoWidget = GestureDetector(
+                                      onTap: () async {
+                                        bool hasBiometrics =
+                                            await authController
+                                                .checkBiometrics();
+                                        bool authenticated = true;
+
+                                        if (hasBiometrics) {
+                                          authenticated = await authController
+                                              .authenticate();
+                                        }
+
+                                        if (authenticated) {
+                                          model.registrarPonto(index, context);
+                                        } else {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                  'Não autenticado. O ponto não foi marcado.'),
+                                              duration: Duration(seconds: 2),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: Container(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.1,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 27, vertical: 10),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [
+                                                Color.fromARGB(
+                                                    255, 57, 146, 247),
+                                                Color.fromARGB(
+                                                    255, 0, 191, 99),
+                                              ]),
+                                          color: model.pontos[index] != null
+                                              ? const Color.fromARGB(
+                                                  255, 0, 191, 99)
+                                              : const Color.fromARGB(
+                                                  33, 0, 191, 99),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                                                              child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              pontoTexto,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: model.pontos[index] != null
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              horaFormatada,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: model.pontos[index] != null
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+
+                                    return Row(
+                                      children: [
+                                        const SizedBox(width: 4),
+                                        pontoWidget,
+                                        if (index < 3) const SizedBox(width: 10),
+                                        const SizedBox(width: 2),
+                                      ],
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
                   ),
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.03,
@@ -304,12 +456,12 @@ class Ponto extends StatelessWidget {
                     height: MediaQuery.of(context).size.height * 0.06,
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          Color.fromARGB(255, 57, 146, 247),
-                                          Color.fromARGB(255, 0, 191, 99),
-                                        ]),
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Color.fromARGB(255, 57, 146, 247),
+                            Color.fromARGB(255, 0, 191, 99),
+                          ]),
                       borderRadius: BorderRadius.all(
                         Radius.circular(20),
                       ),
@@ -322,14 +474,13 @@ class Ponto extends StatelessWidget {
                     ),
                     child: TextButton(
                       onPressed: () async {
-                        bool hasBiometrics =
-                            await authController.checkBiometrics();
+                        bool hasBiometrics = await authController.checkBiometrics();
                         bool authenticated = true;
-              
+
                         if (hasBiometrics) {
                           authenticated = await authController.authenticate();
                         }
-              
+
                         if (authenticated) {
                           int index = model.pontos
                               .indexWhere((element) => element == null);
@@ -339,13 +490,13 @@ class Ponto extends StatelessWidget {
                                 formatterDate.format(model.now);
                             String formattedTime =
                                 formatterTime.format(model.now);
-              
+
                             // Enviar para a API
                             bool success =
                                 await ApiPontoService().sendPunchClock(
                               model.now,
                             );
-              
+
                             if (success) {
                               model.registrarPonto(index, context);
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -365,8 +516,7 @@ class Ponto extends StatelessWidget {
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content:
-                                    Text('Você já marcou os 4 pontos hoje.'),
+                                content: Text('Você já marcou os 4 pontos hoje.'),
                                 duration: Duration(seconds: 2),
                               ),
                             );
@@ -390,12 +540,12 @@ class Ponto extends StatelessWidget {
                       ),
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      model.limparPontos();
-                    },
-                    child: const Text('Limpar Pontos Para teste'),
-                  ),
+                  // ElevatedButton(
+                  //   onPressed: () {
+                  //     model.limparPontos();
+                  //   },
+                  //   child: const Text('Limpar Pontos Para teste'),
+                  // ),
                 ],
               ),
             ),

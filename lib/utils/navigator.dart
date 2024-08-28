@@ -57,7 +57,7 @@ class NavigatorBarMenu extends StatelessWidget {
                 if (index == 3) {
                   UsuarioRep.tabela.clear();
                   PontoNotifier.logout(pontoNotifier);
-                  Get.off(() => LoginPage());
+                  Get.off(() => const LoginPage());
                 } else {
                   controller.selectedIndex.value = index;
                 }

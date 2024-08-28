@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../Service/auth_Login_Service.dart';
 import '../controller/local_auth.dart';
 import '../controller/login_controller.dart';
+import '../controller/ponto_notifier.dart';
 import '../routes/routes.dart';
 
 class AuthProvider with ChangeNotifier {
@@ -114,8 +115,13 @@ class AuthProvider with ChangeNotifier {
                 prefs.remove('hasBiometrics');
               }
 
-              _isLoading = false;
+
+                            // Carregar os pontos após o login
+              final pontoNotifier = Provider.of<PontoNotifier>(context, listen: false);
+              await pontoNotifier.fetchPontosDoDia();
+              _isLoading = false; 
               notifyListeners();
+
               return true;
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -176,8 +182,6 @@ class AuthProvider with ChangeNotifier {
 
   IconData get showPasswordIcon => _obscureText ? Icons.visibility_off : Icons.visibility;
 }
-
-
 
 final AuthService authService = AuthService();
 
@@ -301,120 +305,113 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
-
-
-  
-
   Checkbox checkboxConected(AuthProvider provider) {
     return Checkbox(
-                            activeColor: Color.fromARGB(255, 0, 191, 99),
-                            checkColor: Color.fromARGB(255, 0, 191, 99),
-                            hoverColor: Color.fromARGB(255, 0, 191, 99),
-                            fillColor: WidgetStateProperty.all(
-                              const Color.fromARGB(255, 255, 255, 255),
-                            ),
-                            value: provider.isChecked,
-                            onChanged: (bool? value) {
-                              provider.setChecked(value ?? false);
-                            },
-                          );
+      activeColor: Color.fromARGB(255, 0, 191, 99),
+      checkColor: Color.fromARGB(255, 0, 191, 99),
+      hoverColor: Color.fromARGB(255, 0, 191, 99),
+      fillColor: WidgetStateProperty.all(
+        const Color.fromARGB(255, 255, 255, 255),
+      ),
+      value: provider.isChecked,
+      onChanged: (bool? value) {
+        provider.setChecked(value ?? false);
+      },
+    );
   }
 
   Container Login(double widthbox, BuildContext context, AuthProvider provider, double fontSizeall) {
     return Container(
-                      width: widthbox,
-                      height:  MediaQuery.of(context).size.height * 0.07,
-                      decoration: BoxDecoration(
-                       gradient: const LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          Color.fromARGB(255, 57, 146, 247),
-                                          Color.fromARGB(255, 0, 191, 99),
-                                        ]),
-                        border: Border.all(
-                          color: const Color.fromARGB(255, 0, 191, 99),
-                          width: 0.9,
-                        ),
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(20),
-                        ),
-                      ),
-                      child: TextButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            bool isValid =
-                                await provider.validateAccess(context);
-                            if (isValid) {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    content: SizedBox(
-                                      width:
-                                          MediaQuery.of(context).size.width *
-                                              0.6,
-                                      child: ValidadorAcessos(
-                                        onCodeValidated: (code) {
-                                          Navigator.of(context).pop();
-                                      
-                                          Navigator.of(context)
-                                              .pushReplacementNamed(
-                                            AppRoutes.NAVIGATORBARMENU,
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
-                            }
-                          }
+      width: widthbox,
+      height:  MediaQuery.of(context).size.height * 0.07,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color.fromARGB(255, 57, 146, 247),
+            Color.fromARGB(255, 0, 191, 99),
+          ],
+        ),
+        border: Border.all(
+          color: const Color.fromARGB(255, 0, 191, 99),
+          width: 0.9,
+        ),
+        borderRadius: const BorderRadius.all(
+          Radius.circular(20),
+        ),
+      ),
+      child: TextButton(
+        onPressed: () async {
+          if (_formKey.currentState!.validate()) {
+            bool isValid = await provider.validateAccess(context);
+            if (isValid) {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    content: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.6,
+                      child: ValidadorAcessos(
+                        onCodeValidated: (code) {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pushReplacementNamed(
+                            AppRoutes.NAVIGATORBARMENU,
+                          );
                         },
-                        child: Text(
-                          'Login',
-                          style: TextStyle(
-                            color: Color.fromARGB(255, 255, 255, 255),
-                            fontSize: fontSizeall,
-                          ),
-                        ),
                       ),
-                    );
-  }
-
-  Widget loginShowObjects(
-      double widthbox, double fontSizeall, AuthProvider provider) {
-    return Container(
-        height: MediaQuery.of(context).size.height * 0.07,
-        width: widthbox,
-        decoration: BoxDecoration(
-         gradient: const LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                          colors: [
-                                            Color.fromARGB(255, 57, 146, 247),
-                                            Color.fromARGB(255, 0, 191, 99),
-                                          ]),
-          border: Border.all(
-            color: const Color.fromARGB(255, 0, 191, 99),
-            width: 0.9,
-          ),
-          borderRadius: const BorderRadius.all(
-            Radius.circular(20),
+                    ),
+                  );
+                },
+              );
+            }
+          }
+        },
+        child: Text(
+          'Login',
+          style: TextStyle(
+            color: Color.fromARGB(255, 255, 255, 255),
+            fontSize: fontSizeall,
           ),
         ),
-        child: TextButton(
-          onPressed: () {
-            provider.toggleShowInput();
-          },
-          child: Text(
-            'Login',
-            style: TextStyle(
-              color: const Color.fromARGB(255, 255, 255, 255),
-              fontSize: fontSizeall,
-            ),
+      ),
+    );
+  }
+
+  Widget loginShowObjects(double widthbox, double fontSizeall, AuthProvider provider) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.07,
+      width: widthbox,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color.fromARGB(255, 57, 146, 247),
+            Color.fromARGB(255, 0, 191, 99),
+          ],
+        ),
+        border: Border.all(
+          color: const Color.fromARGB(255, 0, 191, 99),
+          width: 0.9,
+        ),
+        borderRadius: const BorderRadius.all(
+          Radius.circular(20),
+        ),
+      ),
+      child: TextButton(
+        onPressed: () {
+          provider.toggleShowInput();
+        },
+        child: Text(
+          'Login',
+          style: TextStyle(
+            color: const Color.fromARGB(255, 255, 255, 255),
+            fontSize: fontSizeall,
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget emailTextForm(double widthbox, AuthProvider provider) {
@@ -480,4 +477,3 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 }
-
