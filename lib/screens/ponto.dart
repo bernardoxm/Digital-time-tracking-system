@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
@@ -41,7 +42,7 @@ class Ponto extends StatelessWidget {
               child: Column(
                 children: [
                   Container(
-                    height: 220,
+                    height: 250,
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
                           begin: Alignment.topLeft,
@@ -62,9 +63,11 @@ class Ponto extends StatelessWidget {
                       ],
                     ),
                     child: Column(
+                      
                       children: [
+
                         SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.02,
+                          height: MediaQuery.of(context).size.height * 0.04,
                         ),
                         Center(
                           child: GestureDetector(
