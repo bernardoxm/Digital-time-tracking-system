@@ -66,5 +66,6 @@ assets/: Recursos estáticos como imagens e vídeos.
 
 ![Simulator Screenshot - iPhone 15 Pro Max - 2024-08-09 at 16 35 03](https://github.com/user-attachments/assets/fdfcda0e-0ec7-43b6-bca6-b8ef90335c16)
 
+![Simulator Screenshot - iPhone 15 Pro Max - 2024-08-29 at 22 26 38](https://github.com/user-attachments/assets/34db4d43-23d9-4c0a-b4f1-0048feda16d9)
 
 
