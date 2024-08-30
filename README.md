@@ -50,22 +50,11 @@ utils/: Utilitários e funções auxiliares usadas em toda a aplicação.
 
 assets/: Recursos estáticos como imagens e vídeos.
 
-![Simulator Screenshot - iPhone 15 Pro Max - 2024-08-09 at 16 30 28](https://github.com/user-attachments/assets/c8c2834a-9c53-4705-b0c3-d22621655992)
-
-![Simulator Screenshot - iPhone 15 Pro Max - 2024-08-09 at 16 30 36](https://github.com/user-attachments/assets/9070975c-6af1-405e-943f-fa597e1a2ed7)
-
-![Simulator Screenshot - iPhone 15 Pro Max - 2024-08-09 at 16 31 00](https://github.com/user-attachments/assets/5b560c78-56fc-473b-a8e1-34651ede093d)
-
-![Simulator Screenshot - iPhone 15 Pro Max - 2024-08-09 at 16 31 13](https://github.com/user-attachments/assets/833ed6b0-9d55-4cca-9854-e8d36728518f)
-
-![Simulator Screenshot - iPhone 15 Pro Max - 2024-08-09 at 16 34 39](https://github.com/user-attachments/assets/a0ae75f9-710f-49ff-aaf5-f24167d9cbd1)
-
-![Simulator Screenshot - iPhone 15 Pro Max - 2024-08-09 at 16 34 42](https://github.com/user-attachments/assets/01bf384f-2352-4547-b7e2-a560fcd19ba3)
-
-![Simulator Screenshot - iPhone 15 Pro Max - 2024-08-09 at 16 34 47](https://github.com/user-attachments/assets/6486843c-b640-4f93-a370-5c818179b42d)
-
-![Simulator Screenshot - iPhone 15 Pro Max - 2024-08-09 at 16 35 03](https://github.com/user-attachments/assets/fdfcda0e-0ec7-43b6-bca6-b8ef90335c16)
-
-![Simulator Screenshot - iPhone 15 Pro Max - 2024-08-29 at 22 26 38](https://github.com/user-attachments/assets/34db4d43-23d9-4c0a-b4f1-0048feda16d9)
+| ![Screenshot 1](https://github.com/user-attachments/assets/c8c2834a-9c53-4705-b0c3-d22621655992) | ![Screenshot 2](https://github.com/user-attachments/assets/9070975c-6af1-405e-943f-fa597e1a2ed7) |
+|:--:|:--:|
+| ![Screenshot 3](https://github.com/user-attachments/assets/5b560c78-56fc-473b-a8e1-34651ede093d) | ![Screenshot 4](https://github.com/user-attachments/assets/833ed6b0-9d55-4cca-9854-e8d36728518f) |
+| ![Screenshot 5](https://github.com/user-attachments/assets/a0ae75f9-710f-49ff-aaf5-f24167d9cbd1) | ![Screenshot 6](https://github.com/user-attachments/assets/01bf384f-2352-4547-b7e2-a560fcd19ba3) |
+| ![Screenshot 7](https://github.com/user-attachments/assets/6486843c-b640-4f93-a370-5c818179b42d) | ![Screenshot 8](https://github.com/user-attachments/assets/fdfcda0e-0ec7-43b6-bca6-b8ef90335c16) |
+| ![Screenshot 9](https://github.com/user-attachments/assets/34db4d43-23d9-4c0a-b4f1-0048feda16d9) | |
 
 
